@@ -332,13 +332,13 @@ const DoaPage = () => {
 
             <Card>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex w-full items-center gap-2 rounded-full border border-emerald-100 px-3 py-2 sm:w-auto">
+                <div className="flex w-full min-w-0 items-center gap-2 rounded-full border border-emerald-100 px-3 py-2 sm:w-auto sm:flex-1">
                   <Search className="h-4 w-4 text-emerald-600" />
                   <input
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                     placeholder="Cari doa (min 3 huruf)"
-                    className="w-full text-sm outline-none"
+                    className="min-w-0 w-full text-sm outline-none"
                   />
                 </div>
                 <button
@@ -471,24 +471,24 @@ const DoaPage = () => {
                       onClick={() => handleSelectDoa(item)}
                       className="cv-auto w-full rounded-xl border border-emerald-100 px-4 py-3 text-left text-sm hover:bg-emerald-50"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="font-semibold text-textPrimary">
+                      <div className="flex flex-wrap items-start gap-2 sm:flex-nowrap">
+                        <p className="min-w-0 flex-1 break-words font-semibold text-textPrimary">
                           {isSearch
                             ? highlightText(label, debouncedKeyword)
                             : label}
                         </p>
                         {hasAudio ? (
-                          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                          <span className="ml-auto shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
                             Audio
                           </span>
                         ) : null}
                       </div>
                       {category ? (
-                        <p className="mt-1 text-[11px] text-emerald-700">
+                        <p className="mt-1 break-words text-[11px] text-emerald-700">
                           {category}
                         </p>
                       ) : null}
-                      <p className="mt-1 text-xs text-textSecondary">
+                      <p className="mt-1 break-words text-xs text-textSecondary">
                         {isSearch
                           ? highlightText(translation, debouncedKeyword)
                           : translation}
@@ -515,29 +515,29 @@ const DoaPage = () => {
             {detailContent ? (
               <div className="mt-4 space-y-4">
                 <div>
-                  <p className="text-xs text-emerald-700">
+                  <p className="break-words text-xs text-emerald-700">
                     {detailContent.title}
                   </p>
                   {detailContent.category ? (
-                    <p className="mt-1 text-[11px] text-emerald-700">
+                    <p className="mt-1 break-words text-[11px] text-emerald-700">
                       {detailContent.category}
                     </p>
                   ) : null}
                   {detailContent.arabic ? (
                     <p
-                      className="mt-3 text-right font-arabic text-xl leading-relaxed text-textPrimary"
+                      className="mt-3 whitespace-pre-line break-words text-right font-arabic text-xl leading-relaxed text-textPrimary sm:text-2xl"
                       dir="rtl"
                     >
                       {detailContent.arabic}
                     </p>
                   ) : null}
                   {detailContent.translation ? (
-                    <p className="mt-3 text-sm text-textSecondary">
+                    <p className="mt-3 whitespace-pre-line break-words text-sm text-textSecondary">
                       {detailContent.translation}
                     </p>
                   ) : null}
                   {detailContent.transliteration ? (
-                    <p className="mt-3 text-sm italic text-textSecondary">
+                    <p className="mt-3 whitespace-pre-line break-words text-sm italic text-textSecondary">
                       {detailContent.transliteration}
                     </p>
                   ) : null}
@@ -552,7 +552,7 @@ const DoaPage = () => {
                           module: "doa",
                         })
                       }
-                      className="mt-3 inline-flex rounded-full border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700"
+                      className="mt-3 inline-flex w-full rounded-full border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 sm:w-auto"
                     >
                       Putar di Player
                     </button>
@@ -580,7 +580,7 @@ const DoaPage = () => {
                     {detailContent.tags.map((tag: string) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-emerald-100 px-3 py-2 text-[11px] text-emerald-700"
+                        className="max-w-full break-words rounded-full border border-emerald-100 px-3 py-2 text-[11px] text-emerald-700"
                       >
                         {tag}
                       </span>

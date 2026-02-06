@@ -46,6 +46,29 @@ type QiblaData = {
   direction: number;
 };
 
+const parseCoordinate = (value: unknown): number | null => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === "string") {
+    const cleaned = value.trim().replace(",", ".");
+    if (!cleaned) return null;
+    const parsed = Number.parseFloat(cleaned);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const normalizeQibla = (payload: unknown): QiblaData | null => {
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as Record<string, unknown>;
+  const latitude = parseCoordinate(record.latitude);
+  const longitude = parseCoordinate(record.longitude);
+  const direction = parseCoordinate(record.direction);
+  if (latitude == null || longitude == null || direction == null) return null;
+  return { latitude, longitude, direction };
+};
+
 const SholatPage = () => {
   const [query, setQuery] = useState("");
   const debounced = useDebouncedValue(query, 300);
@@ -189,9 +212,9 @@ const SholatPage = () => {
         setQiblaError("Koordinat lokasi tidak ditemukan.");
         return;
       }
-      const lat = Number.parseFloat(String(latRaw));
-      const lon = Number.parseFloat(String(lonRaw));
-      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      const lat = parseCoordinate(latRaw);
+      const lon = parseCoordinate(lonRaw);
+      if (lat == null || lon == null) {
         setQiblaError("Koordinat lokasi tidak valid.");
         return;
       }
@@ -222,8 +245,14 @@ const SholatPage = () => {
       setQiblaError(null);
     }
     try {
-      const res = await fetchJson<QiblaData>(`/qibla/${lat},${lon}`);
-      setQibla(res.data ?? null);
+      const res = await fetchJson<unknown>(`/qibla/${lat},${lon}`);
+      const normalized = normalizeQibla(res.data);
+      if (!normalized) {
+        setQibla(null);
+        setQiblaError("Data arah kiblat tidak valid.");
+        return;
+      }
+      setQibla(normalized);
     } catch (err) {
       setQiblaError((err as Error).message);
     } finally {
@@ -234,7 +263,7 @@ const SholatPage = () => {
   };
 
   const handleUseLocation = () => {
-    if (typeof window !== "undefined" && !window.isSecureContext) {
+    if (typeof window !== "undefined" && window.isSecureContext === false) {
       setQiblaError(
         "Lokasi hanya bisa diakses via HTTPS atau localhost. Gunakan input manual atau lokasi terpilih.",
       );
@@ -280,9 +309,9 @@ const SholatPage = () => {
   };
 
   const handleManualQibla = () => {
-    const lat = Number.parseFloat(latInput);
-    const lon = Number.parseFloat(lonInput);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    const lat = parseCoordinate(latInput);
+    const lon = parseCoordinate(lonInput);
+    if (lat == null || lon == null) {
       setQiblaError("Masukkan latitude dan longitude yang valid.");
       return;
     }
@@ -798,6 +827,7 @@ const SholatPage = () => {
                     value={latInput}
                     onChange={(event) => setLatInput(event.target.value)}
                     placeholder="-6.200000"
+                    inputMode="decimal"
                     className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                   />
                 </label>
@@ -807,6 +837,7 @@ const SholatPage = () => {
                     value={lonInput}
                     onChange={(event) => setLonInput(event.target.value)}
                     placeholder="106.816666"
+                    inputMode="decimal"
                     className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                   />
                 </label>
