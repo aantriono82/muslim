@@ -403,7 +403,8 @@ export const fetchJson = async <T>(
         (err.code === "http" && err.status === 404))
     ) {
       const result = await handleDoaFallback<T>(path, init);
-      setApiStatus("fallback", "equran");
+      const status = primaryBase === "/api" ? "fallback" : "ok";
+      setApiStatus(status, "equran");
       return result;
     }
     throw err;
