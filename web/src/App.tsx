@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import MobileNav from "./components/MobileNav";
 import Footer from "./components/Footer";
 import OfflineBanner from "./components/OfflineBanner";
+import ApiStatusBanner from "./components/ApiStatusBanner";
 import HomePage from "./pages/HomePage";
 import SholatPage from "./pages/SholatPage";
 import KalenderPage from "./pages/KalenderPage";
@@ -26,6 +27,7 @@ const App = () => {
     <div className="flex min-h-screen flex-col">
       <Header />
       <OfflineBanner />
+      <ApiStatusBanner />
       <main className="content-shell flex-1 pb-24 lg:pb-12">
         <Routes>
           <Route path="/" element={<HomePage />} />

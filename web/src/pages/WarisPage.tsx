@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Download, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
 import { Card, EmptyState } from "../components/State";
@@ -209,44 +209,12 @@ const WarisPage = () => {
     setHeirs(template.heirs);
   };
 
-  const handleExport = () => {
-    const payload = {
-      input: {
-        totalWealth: parseNumber(totalWealth),
-        debts: parseNumber(debts),
-        funeralCost: parseNumber(funeralCost),
-        wasiat: parseNumber(wasiat),
-        heirs,
-      },
-      result,
-      generatedAt: new Date().toISOString(),
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "waris-result.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="py-10">
       <Container>
         <SectionHeader
           title="Kalkulator Waris"
           subtitle="Simulasi pembagian ringkas mencakup pasangan, orang tua, anak, kakek/nenek, dan saudara kandung."
-          action={
-            <button
-              type="button"
-              onClick={handleExport}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-200 px-4 py-2 text-xs font-semibold text-emerald-700 sm:w-auto"
-            >
-              <Download className="h-4 w-4" /> Export JSON
-            </button>
-          }
         />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
