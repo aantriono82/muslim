@@ -3,9 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
-import { Card, ErrorState, LoadingState } from "../components/State";
+import { ErrorState, LoadingState } from "../components/State";
 import { fetchJson } from "../lib/api";
-import { useAudio } from "../lib/audio";
 import { toArabicNumber } from "../lib/arabic";
 import type { AyahItem } from "../lib/types";
 
@@ -14,7 +13,6 @@ const AyahDetailPage = () => {
   const [data, setData] = useState<AyahItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { setTrack } = useAudio();
 
   useEffect(() => {
     if (!surahId || !ayahId) return;
@@ -37,6 +35,13 @@ const AyahDetailPage = () => {
           <ArrowLeft className="h-4 w-4" /> Kembali ke surah
         </Link>
         <SectionHeader title={`Detail Ayat ${ayahId}`} />
+        <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+          Untuk mendengar bacaan ayat, buka halaman{" "}
+          <Link to="/murratal" className="font-semibold underline">
+            Murratal
+          </Link>
+          .
+        </div>
 
         {loading ? <LoadingState message="Memuat ayat..." /> : null}
         {error ? <ErrorState message={error} /> : null}
@@ -77,27 +82,6 @@ const AyahDetailPage = () => {
                           Tafsir Singkat
                         </p>
                         <p className="mt-1">{data.tafsir.kemenag.short}</p>
-                      </div>
-                    ) : null}
-                    {data.audio_url ? (
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setTrack({
-                              title: `Surah ${data.surah_number} · Ayat ${data.ayah_number}`,
-                              subtitle: "Audio Ayat",
-                              src: data.audio_url ?? "",
-                              module: "quran",
-                            })
-                          }
-                          className="rounded-full border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700"
-                        >
-                          Putar di Player
-                        </button>
-                        <audio className="w-full" controls preload="none">
-                          <source src={data.audio_url} />
-                        </audio>
                       </div>
                     ) : null}
                   </div>

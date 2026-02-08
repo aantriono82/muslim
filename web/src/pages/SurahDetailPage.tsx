@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, PlayCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
-import { Card, ErrorState, LoadingState } from "../components/State";
+import { ErrorState, LoadingState } from "../components/State";
 import { fetchJson, fetchJsonCached } from "../lib/api";
-import { useAudio } from "../lib/audio";
 import { toArabicNumber } from "../lib/arabic";
 import type { SurahDetail, SurahItem } from "../lib/types";
 
@@ -19,7 +18,6 @@ const SurahDetailPage = () => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState<number | null>(null);
   const [surahList, setSurahList] = useState<SurahItem[]>([]);
-  const { setTrack } = useAudio();
 
   useEffect(() => {
     setPage(1);
@@ -122,6 +120,14 @@ const SurahDetailPage = () => {
           }
         />
 
+        <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+          Untuk mendengar bacaan surah, buka halaman{" "}
+          <Link to="/murratal" className="font-semibold underline">
+            Murratal
+          </Link>
+          .
+        </div>
+
         {loading && !data ? <LoadingState message="Memuat surah..." /> : null}
         {error ? <ErrorState message={error} /> : null}
 
@@ -195,22 +201,6 @@ const SurahDetailPage = () => {
                         >
                           Detail Ayat
                         </Link>
-                        {ayah.audio_url ? (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setTrack({
-                                title: `${meta.name_latin} · Ayat ${ayah.ayah_number}`,
-                                subtitle: meta.translation,
-                                src: ayah.audio_url ?? "",
-                                module: "quran",
-                              })
-                            }
-                            className="rounded-full border border-emerald-200 px-3 py-2 font-semibold"
-                          >
-                            Putar di Player
-                          </button>
-                        ) : null}
                       </div>
                     </div>
                   </div>

@@ -120,8 +120,16 @@ const QuranPage = () => {
       <Container>
         <SectionHeader
           title="Al-Qur'an"
-          subtitle="Baca surah, cari ayat, dan dengarkan audio per ayat."
+          subtitle="Fokus membaca Al-Qur'an dan pencarian ayat."
         />
+
+        <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+          Untuk mendengar bacaan, gunakan halaman{" "}
+          <Link to="/murratal" className="font-semibold underline">
+            Murratal
+          </Link>
+          .
+        </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card>
@@ -230,7 +238,7 @@ const QuranPage = () => {
 
             <Card>
               <h3 className="text-sm font-semibold text-textPrimary">
-                Navigasi Juz/Page/Manzil
+                Navigasi Juz/Page/Manzil/Ruku/Hizb
               </h3>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <select
