@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import { Headphones, Play, Shuffle, Search } from "lucide-react";
 import Container from "../components/Container";
@@ -9,8 +16,9 @@ import {
   ErrorState,
   LoadingState,
 } from "../components/State";
-import { fetchJsonCached } from "../lib/api";
-import { useAudio } from "../lib/audio";
+import { API_BASE_URL, fetchJson, fetchJsonCached } from "../lib/api";
+import { useAudio, type AudioTrack } from "../lib/audio";
+import { juzMeta, type JuzMeta } from "../data/juzMeta";
 import type { SurahItem } from "../lib/types";
 
 const resolveAudioUrl = (value: unknown): string | null => {
@@ -38,22 +46,56 @@ const resolveAudioUrl = (value: unknown): string | null => {
   return null;
 };
 
+const proxyAudioUrl = (url: string | null) => {
+  if (!url) return null;
+  if (url.startsWith("blob:")) return url;
+  if (url.startsWith("/api/") || url.startsWith(`${API_BASE_URL}/`)) {
+    return url;
+  }
+  const base = API_BASE_URL.replace(/\/$/, "");
+  return `${base}/audio?url=${encodeURIComponent(url)}`;
+};
+
 const getSurahAudio = (item: SurahItem) =>
-  resolveAudioUrl(
-    (item as { audio_url?: unknown; audio?: unknown; audioFull?: unknown })
-      .audio_url ??
-      (item as { audio?: unknown }).audio ??
-      (item as { audioFull?: unknown }).audioFull,
+  proxyAudioUrl(
+    resolveAudioUrl(
+      (item as { audio_url?: unknown; audio?: unknown; audioFull?: unknown })
+        .audio_url ??
+        (item as { audio?: unknown }).audio ??
+        (item as { audioFull?: unknown }).audioFull,
+    ),
   );
 
 const MurratalPage = () => {
-  const { track, setQueue, setShuffle, setTrack } = useAudio();
+  const {
+    track,
+    queue,
+    currentIndex,
+    setQueue,
+    appendQueue,
+    setShuffle,
+    setTrack,
+    setRepeatMode,
+  } = useAudio();
+  const masonryRef = useRef<HTMLDivElement | null>(null);
   const [surah, setSurah] = useState<SurahItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [juzAudioCache, setJuzAudioCache] = useState<
+    Record<number, AudioTrack[]>
+  >({});
+  const [juzAudioLoading, setJuzAudioLoading] = useState<number | null>(null);
+  const [juzAudioError, setJuzAudioError] = useState<Record<number, string>>(
+    {},
+  );
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("number");
+  const juzAutoAdvanceRef = useRef<{
+    active: boolean;
+    lastAppended: number;
+    inFlight: boolean;
+  }>({ active: false, lastAppended: 0, inFlight: false });
 
   useEffect(() => {
     fetchJsonCached<SurahItem[]>("/quran", {
@@ -89,7 +131,20 @@ const MurratalPage = () => {
     return list;
   }, [surah, filter, sort, query]);
 
-  const buildTrack = (item: SurahItem, audioUrl: string) => ({
+  const surahLookup = useMemo(
+    () => new Map(surah.map((item) => [item.number, item])),
+    [surah],
+  );
+  const filteredLookup = useMemo(
+    () => new Map(filtered.map((item) => [item.number, item])),
+    [filtered],
+  );
+  const filteredOrder = useMemo(
+    () => new Map(filtered.map((item, index) => [item.number, index])),
+    [filtered],
+  );
+
+  const buildTrack = (item: SurahItem, audioUrl: string): AudioTrack => ({
     title: item.name_latin,
     subtitle: `Surah ${item.number} · ${item.translation}`,
     src: audioUrl,
@@ -98,6 +153,26 @@ const MurratalPage = () => {
     format: "MP3",
     module: "murratal",
   });
+
+  const buildJuzTrack = (payload: {
+    juz: number;
+    surahNumber: number;
+    ayahNumber: number;
+    audioUrl: string;
+  }) => {
+    const meta = surahLookup.get(payload.surahNumber);
+    const name = meta?.name_latin ?? `Surah ${payload.surahNumber}`;
+    return {
+      title: `${name} · Ayat ${payload.ayahNumber}`,
+      subtitle: `Juz ${payload.juz}`,
+      src: payload.audioUrl,
+      sourceLabel: "Quran.com CDN",
+      quality: "Alafasy",
+      format: "MP3",
+      module: "murratal-juz",
+      meta: { juz: payload.juz },
+    } satisfies AudioTrack;
+  };
 
   const filteredWithAudio = useMemo(
     () =>
@@ -117,35 +192,255 @@ const MurratalPage = () => {
     [filteredWithAudio],
   );
 
-  const handlePlay = (item: SurahItem) => {
+  const juzGroups = useMemo(() => {
+    return juzMeta
+      .map((meta) => {
+        const items = meta.surahNumbers
+          .map((number) => filteredLookup.get(number))
+          .filter((item): item is SurahItem => Boolean(item));
+        items.sort(
+          (a, b) =>
+            (filteredOrder.get(a.number) ?? 0) -
+            (filteredOrder.get(b.number) ?? 0),
+        );
+        if (items.length === 0) return null;
+        const startMeta = surahLookup.get(meta.start.surah);
+        const endMeta = surahLookup.get(meta.end.surah);
+        return {
+          ...meta,
+          items,
+          startName: startMeta?.name_latin ?? `Surah ${meta.start.surah}`,
+          endName: endMeta?.name_latin ?? `Surah ${meta.end.surah}`,
+        };
+      })
+      .filter(
+        (
+          group,
+        ): group is JuzMeta & {
+          items: SurahItem[];
+          startName: string;
+          endName: string;
+        } => Boolean(group),
+      );
+  }, [filteredLookup, filteredOrder, surahLookup]);
+
+  const buildSurahPlaylist = useCallback(
+    (items: SurahItem[]) =>
+      items
+        .map((entry) => {
+          const audioUrl = getSurahAudio(entry);
+          return audioUrl ? buildTrack(entry, audioUrl) : null;
+        })
+        .filter((entry): entry is AudioTrack => Boolean(entry)),
+    [buildTrack],
+  );
+
+  const handlePlay = (item: SurahItem, listOverride?: SurahItem[]) => {
     const audioUrl = getSurahAudio(item);
     if (!audioUrl) return;
-    const playlist = filteredWithAudio.map((entry) =>
-      buildTrack(entry.item, entry.audioUrl),
-    );
-    const startIndex = filteredWithAudio.findIndex(
-      (entry) => entry.audioUrl === audioUrl,
-    );
+    juzAutoAdvanceRef.current.active = false;
+    const playlistItems = listOverride ?? filtered;
+    const playlist = buildSurahPlaylist(playlistItems);
+    const startIndex = playlist.findIndex((entry) => entry.src === audioUrl);
     setShuffle(false);
+    setRepeatMode("off");
     setQueue(playlist, startIndex >= 0 ? startIndex : 0);
   };
 
   const handleRandom = () => {
     if (filteredWithAudio.length === 0) return;
+    juzAutoAdvanceRef.current.active = false;
     const playlist = filteredWithAudio.map((entry) =>
       buildTrack(entry.item, entry.audioUrl),
     );
     const randomIndex = Math.floor(Math.random() * playlist.length);
     setShuffle(true);
+    setRepeatMode("off");
     setQueue(playlist, randomIndex);
   };
+
+  const fetchJuzAudio = useCallback(
+    async (juz: number) => {
+      const result = await fetchJson<
+        { surah_number: number; ayah_number: number; audio_url: string }[]
+      >(`/quran/juz/${juz}/audio`);
+      const list = Array.isArray(result.data) ? result.data : [];
+      return list
+        .filter((item) => item.audio_url)
+        .map((item) =>
+          buildJuzTrack({
+            juz,
+            surahNumber: item.surah_number,
+            ayahNumber: item.ayah_number,
+            audioUrl: item.audio_url,
+          }),
+        );
+    },
+    [buildJuzTrack],
+  );
+
+  const handlePlayJuz = useCallback(
+    async (juz: number) => {
+      juzAutoAdvanceRef.current = {
+        active: true,
+        lastAppended: juz,
+        inFlight: false,
+      };
+      setJuzAudioError((prev) => {
+        if (!prev[juz]) return prev;
+        const next = { ...prev };
+        delete next[juz];
+        return next;
+      });
+      const cached = juzAudioCache[juz];
+      if (cached && cached.length > 0) {
+        setShuffle(false);
+        setQueue(cached, 0);
+        return;
+      }
+      try {
+        setJuzAudioLoading(juz);
+        const tracks = await fetchJuzAudio(juz);
+        if (tracks.length === 0) {
+          throw new Error("Audio juz tidak tersedia.");
+        }
+        setJuzAudioCache((prev) => ({ ...prev, [juz]: tracks }));
+        setShuffle(false);
+        setRepeatMode("off");
+        setQueue(tracks, 0);
+      } catch (err) {
+        setJuzAudioError((prev) => ({
+          ...prev,
+          [juz]: (err as Error).message,
+        }));
+      } finally {
+        setJuzAudioLoading((current) => (current === juz ? null : current));
+      }
+    },
+    [fetchJuzAudio, juzAudioCache, setQueue, setRepeatMode, setShuffle],
+  );
+
+  useEffect(() => {
+    if (!juzAutoAdvanceRef.current.active) return;
+    if (!track || track.module !== "murratal-juz") return;
+    if (!queue.length) return;
+    if (currentIndex < Math.max(queue.length - 3, 0)) return;
+    const lastTrack = queue[queue.length - 1];
+    const lastJuz =
+      typeof lastTrack?.meta?.juz === "number" ? lastTrack.meta.juz : null;
+    if (!lastJuz || lastJuz >= 30) return;
+    const nextJuz = lastJuz + 1;
+    const state = juzAutoAdvanceRef.current;
+    if (state.inFlight || state.lastAppended >= nextJuz) return;
+
+    let cancelled = false;
+    const run = async () => {
+      state.inFlight = true;
+      try {
+        const cached = juzAudioCache[nextJuz];
+        const tracks =
+          cached && cached.length > 0 ? cached : await fetchJuzAudio(nextJuz);
+        if (cancelled) return;
+        if (!tracks.length) return;
+        if (!cached || cached.length === 0) {
+          setJuzAudioCache((prev) => ({ ...prev, [nextJuz]: tracks }));
+        }
+        appendQueue(tracks);
+        state.lastAppended = nextJuz;
+      } catch (err) {
+        if (cancelled) return;
+        setJuzAudioError((prev) => ({
+          ...prev,
+          [nextJuz]: (err as Error).message,
+        }));
+      } finally {
+        state.inFlight = false;
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [appendQueue, currentIndex, fetchJuzAudio, juzAudioCache, queue, track]);
+
+  const layoutMasonry = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const container = masonryRef.current;
+    if (!container) return;
+    const items = Array.from(
+      container.querySelectorAll<HTMLElement>("[data-masonry-item]"),
+    );
+    if (items.length === 0) {
+      container.style.height = "auto";
+      return;
+    }
+
+    const gap = 16;
+    const columns = 1;
+    const containerWidth = container.clientWidth;
+    const columnWidth =
+      columns === 1
+        ? containerWidth
+        : (containerWidth - gap * (columns - 1)) / columns;
+    const columnHeights = new Array(columns).fill(0);
+
+    items.forEach((item) => {
+      item.style.position = "absolute";
+      item.style.width = `${columnWidth}px`;
+      item.style.left = "0px";
+      item.style.top = "0px";
+      item.style.transform = "translate(0px, 0px)";
+    });
+
+    items.forEach((item) => {
+      let targetColumn = 0;
+      for (let i = 1; i < columns; i += 1) {
+        if (columnHeights[i] < columnHeights[targetColumn]) {
+          targetColumn = i;
+        }
+      }
+      const x = targetColumn * (columnWidth + gap);
+      const y = columnHeights[targetColumn];
+      item.style.transform = `translate(${x}px, ${y}px)`;
+      columnHeights[targetColumn] = y + item.offsetHeight + gap;
+    });
+
+    const height = Math.max(...columnHeights) - gap;
+    container.style.height = `${Math.max(0, height)}px`;
+  }, []);
+
+  useLayoutEffect(() => {
+    layoutMasonry();
+  }, [layoutMasonry, juzGroups]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleResize = () => layoutMasonry();
+    window.addEventListener("resize", handleResize);
+    const observer = new ResizeObserver(() => layoutMasonry());
+    const container = masonryRef.current;
+    if (container) {
+      observer.observe(container);
+      const items = container.querySelectorAll<HTMLElement>(
+        "[data-masonry-item]",
+      );
+      items.forEach((item) => observer.observe(item));
+    }
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(layoutMasonry).catch(() => undefined);
+    }
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
+  }, [layoutMasonry, juzGroups]);
 
   return (
     <div className="py-10">
       <Container>
         <SectionHeader
           title="Murratal Quran"
-          subtitle="Dengarkan murattal per surah dari audio resmi API MyQuran."
+          subtitle="Dengarkan murattal per surah (MyQuran) atau per juz sesuai rentang ayat (Quran.com)."
         />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -187,7 +482,7 @@ const MurratalPage = () => {
               </button>
             </div>
 
-            <div className="mt-4 space-y-3">
+            <div className="mt-4">
               {loading ? (
                 <LoadingState message="Memuat daftar murratal..." />
               ) : null}
@@ -195,51 +490,135 @@ const MurratalPage = () => {
               {!loading && !error && filtered.length === 0 ? (
                 <EmptyState message="Surah tidak ditemukan." />
               ) : null}
-              {filtered.map((item) => {
-                const audioUrl = audioLookup.get(item.number);
-                const isPlaying = Boolean(audioUrl) && track?.src === audioUrl;
-                return (
-                  <div
-                    key={item.number}
-                    className={`cv-auto flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${
-                      isPlaying
-                        ? "border-emerald-300 bg-emerald-50"
-                        : "border-emerald-100"
-                    }`}
-                  >
-                    <div>
-                      <p className="font-semibold text-textPrimary">
-                        {item.name_latin}
-                      </p>
-                      <p className="text-xs text-textSecondary">
-                        {item.translation} · {item.revelation} ·{" "}
-                        {item.number_of_ayahs} ayat
-                      </p>
+              {!loading &&
+              !error &&
+              filtered.length > 0 &&
+              juzGroups.length === 0 ? (
+                <EmptyState message="Data juz belum tersedia." />
+              ) : null}
+              {!loading &&
+              !error &&
+              filtered.length > 0 &&
+              juzGroups.length > 0 ? (
+                <div ref={masonryRef} className="relative mt-4">
+                  {juzGroups.map((group) => (
+                    <div
+                      key={group.juz}
+                      data-masonry-item
+                      className="rounded-2xl border border-amber-200 bg-white/95 p-4 shadow-sm"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                            Juz {group.juz}
+                          </span>
+                          <span className="text-xs text-textSecondary">
+                            {group.startName} - {group.endName}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-[11px] text-emerald-700">
+                            {group.items.length} surah
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handlePlayJuz(group.juz)}
+                            disabled={juzAudioLoading === group.juz}
+                            className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {juzAudioLoading === group.juz
+                              ? "Memuat..."
+                              : "Putar Juz"}
+                          </button>
+                        </div>
+                      </div>
+                      {juzAudioError[group.juz] ? (
+                        <p className="mt-2 text-[11px] text-rose-600">
+                          {juzAudioError[group.juz]}
+                        </p>
+                      ) : null}
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-textSecondary">
+                        <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-amber-700">
+                          {group.start.surah}:{group.start.ayah} -{" "}
+                          {group.end.surah}:{group.end.ayah}
+                        </span>
+                        <span>Urutan sesuai mushaf.</span>
+                      </div>
+                      <div className="mt-3 space-y-2">
+                        {group.items.map((item) => {
+                          const audioUrl = audioLookup.get(item.number);
+                          const isPlaying =
+                            Boolean(audioUrl) && track?.src === audioUrl;
+                          const rangeStart =
+                            group.start.surah === item.number
+                              ? group.start.ayah
+                              : 1;
+                          const rangeEnd =
+                            group.end.surah === item.number
+                              ? group.end.ayah
+                              : item.number_of_ayahs;
+                          const isPartialRange =
+                            rangeStart !== 1 ||
+                            rangeEnd !== item.number_of_ayahs;
+                          const rangeQuery = isPartialRange
+                            ? `?start=${rangeStart}&end=${rangeEnd}`
+                            : "";
+                          return (
+                            <div
+                              key={item.number}
+                              className={`cv-auto flex flex-col gap-2 rounded-xl border px-3 py-3 text-sm ${
+                                isPlaying
+                                  ? "border-emerald-300 bg-emerald-50"
+                                  : "border-emerald-100 bg-white/80"
+                              }`}
+                            >
+                              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                                <div className="flex min-w-0 items-start gap-2">
+                                  <span className="mt-0.5 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+                                    {item.number}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold leading-snug text-textPrimary">
+                                      {item.name_latin}
+                                    </p>
+                                    <p className="mt-1 break-words text-[11px] text-textSecondary">
+                                      {item.translation} · {item.revelation} ·{" "}
+                                      {item.number_of_ayahs} ayat
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex flex-wrap gap-2 sm:justify-end">
+                                  <Link
+                                    to={`/quran/${item.number}${rangeQuery}`}
+                                    className="w-full rounded-full border border-emerald-200 px-3 py-1.5 text-center text-[11px] font-semibold text-emerald-700 sm:w-auto sm:min-w-[96px]"
+                                  >
+                                    Buka Surah
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handlePlay(item, group.items)
+                                    }
+                                    disabled={!audioUrl}
+                                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold sm:w-auto sm:min-w-[96px] ${
+                                      audioUrl
+                                        ? "border-emerald-200 text-emerald-700"
+                                        : "border-emerald-100 text-emerald-300"
+                                    }`}
+                                  >
+                                    <Play className="h-4 w-4" />
+                                    {isPlaying ? "Sedang Diputar" : "Play"}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <Link
-                        to={`/quran/${item.number}`}
-                        className="w-full rounded-full border border-emerald-200 px-3 py-2 text-center text-xs font-semibold text-emerald-700 sm:w-auto"
-                      >
-                        Buka Surah
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => handlePlay(item)}
-                        disabled={!audioUrl}
-                        className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-semibold sm:w-auto ${
-                          audioUrl
-                            ? "bg-emerald-600 text-white"
-                            : "bg-emerald-100 text-emerald-400"
-                        }`}
-                      >
-                        <Play className="h-4 w-4" />
-                        {isPlaying ? "Sedang Diputar" : "Play"}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  ))}
+                </div>
+              ) : null}
             </div>
           </Card>
 
@@ -280,9 +659,9 @@ const MurratalPage = () => {
                 Informasi Reciter
               </h3>
               <p className="mt-2 text-sm text-textSecondary">
-                Audio murattal diambil langsung dari API MyQuran dengan reciter
-                default. Saat menekan play, aplikasi membentuk antrian surah
-                sesuai daftar yang sedang ditampilkan.
+                Audio surah memakai sumber resmi API MyQuran. Tombol Putar Juz
+                memakai potongan ayat per juz dari Quran.com (reciter Alafasy),
+                sehingga pemutaran mengikuti rentang ayat dalam juz tersebut.
               </p>
             </Card>
           </div>

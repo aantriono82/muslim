@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run src",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
+    "deploy:cloudflare": "test -n \"$CF_PAGES_PROJECT\" || { echo \"Set CF_PAGES_PROJECT terlebih dulu\"; exit 1; }; vite build && npx wrangler pages deploy dist --project-name \"$CF_PAGES_PROJECT\""
   },
   "dependencies": {
     "lucide-react": "^0.476.0",
@@ -16,6 +19,7 @@
     "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/typography": "^0.5.12",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
