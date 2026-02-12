@@ -1556,6 +1556,37 @@ body {
     );
 }
 
+.back-to-top-btn {
+    border: 1px solid #b7d6c0;
+    background: rgba(255, 255, 255, 0.94);
+    color: #116646;
+    box-shadow: 0 12px 24px rgba(16, 24, 40, 0.16);
+}
+
+.back-to-top-btn:hover {
+    background: #ecfdf3;
+}
+
+.back-to-top-btn:focus-visible {
+    outline: 2px solid #108965;
+    outline-offset: 2px;
+}
+
+:root[data-theme="dark"] .back-to-top-btn {
+    border-color: #3f5a62;
+    background: rgba(18, 30, 43, 0.95);
+    color: #86d9b1;
+    box-shadow: 0 14px 28px rgba(2, 8, 16, 0.55);
+}
+
+:root[data-theme="dark"] .back-to-top-btn:hover {
+    background: rgba(24, 40, 56, 0.98);
+}
+
+:root[data-theme="dark"] .back-to-top-btn:focus-visible {
+    outline-color: #4ba977;
+}
+
 #root {
     min-height: 100vh;
 }

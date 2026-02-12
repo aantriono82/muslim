@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAudio } from "../lib/audio";
 
-const SHOW_AFTER_PX = 420;
+const SHOW_AFTER_PX = 150;
 
 const readScrollTop = () => {
   if (typeof window === "undefined") return 0;
@@ -71,7 +71,7 @@ const BackToTopButton = () => {
       onClick={handleBackToTop}
       aria-label="Kembali ke atas"
       title="Kembali ke atas"
-      className={`fixed right-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-emerald-200 bg-white/95 text-emerald-700 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 lg:bottom-6 ${
+      className={`back-to-top-btn fixed right-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none lg:bottom-6 ${
         isVisible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-3 opacity-0"
