@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, Compass, MapPin, Navigation2, Search } from "lucide-react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Bell, Compass, MapPin, Search } from "lucide-react";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
 import {
@@ -9,7 +9,7 @@ import {
   ErrorState,
   LoadingState,
 } from "../components/State";
-import { fetchJson } from "../lib/api";
+import { fetchJson, fetchJsonCached } from "../lib/api";
 import {
   formatMonthId,
   formatDateId,
@@ -46,6 +46,9 @@ type QiblaData = {
   direction: number;
 };
 
+const KAABA_LATITUDE = 21.422487;
+const KAABA_LONGITUDE = 39.826206;
+
 const parseCoordinate = (value: unknown): number | null => {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : null;
@@ -59,17 +62,141 @@ const parseCoordinate = (value: unknown): number | null => {
   return null;
 };
 
-const normalizeQibla = (payload: unknown): QiblaData | null => {
-  if (!payload || typeof payload !== "object") return null;
-  const record = payload as Record<string, unknown>;
-  const latitude = parseCoordinate(record.latitude);
-  const longitude = parseCoordinate(record.longitude);
-  const direction = parseCoordinate(record.direction);
-  if (latitude == null || longitude == null || direction == null) return null;
-  return { latitude, longitude, direction };
+const normalizeDirection = (direction: number) => {
+  const normalized = direction % 360;
+  return normalized >= 0 ? normalized : normalized + 360;
+};
+
+const toRadians = (value: number) => (value * Math.PI) / 180;
+const toDegrees = (value: number) => (value * 180) / Math.PI;
+
+const calculateQiblaDirection = (latitude: number, longitude: number) => {
+  const lat1 = toRadians(latitude);
+  const lon1 = toRadians(longitude);
+  const lat2 = toRadians(KAABA_LATITUDE);
+  const lon2 = toRadians(KAABA_LONGITUDE);
+  const deltaLon = lon2 - lon1;
+
+  const y = Math.sin(deltaLon);
+  const x =
+    Math.cos(lat1) * Math.tan(lat2) - Math.sin(lat1) * Math.cos(deltaLon);
+  const direction = toDegrees(Math.atan2(y, x));
+  return normalizeDirection(direction);
+};
+
+type QiblaCompassProps = {
+  direction: number;
+  size: "sm" | "lg";
+};
+
+const QiblaCompass = ({ direction, size }: QiblaCompassProps) => {
+  const isLarge = size === "lg";
+  const normalizedDirection = normalizeDirection(direction);
+  const crossLength = isLarge ? 80 : 48;
+  const needleLength = isLarge ? 92 : 50;
+  const arrowWidth = isLarge ? 10 : 8;
+  const arrowHeight = isLarge ? 16 : 12;
+  const centerDot = isLarge ? 12 : 10;
+  const locationBadgeDistance =
+    needleLength + arrowHeight + (isLarge ? 14 : 10);
+
+  const needleStyle: CSSProperties = {
+    transform: `translate(-50%, -50%) rotate(${normalizedDirection}deg)`,
+    transition: "transform 180ms ease-out",
+  };
+
+  const needleShaftStyle: CSSProperties = {
+    height: `${needleLength}px`,
+    transform: "translate(-50%, -100%)",
+  };
+
+  const needleHeadStyle: CSSProperties = {
+    borderLeft: `${arrowWidth}px solid transparent`,
+    borderRight: `${arrowWidth}px solid transparent`,
+    borderBottom: `${arrowHeight}px solid #059669`,
+    transform: `translate(-50%, calc(-100% - ${needleLength}px))`,
+  };
+
+  const qiblaMarkerStyle: CSSProperties = {
+    transform: `translate(-50%, -50%) rotate(${normalizedDirection}deg) translateY(-${locationBadgeDistance}px) rotate(${-normalizedDirection}deg)`,
+    transition: "transform 180ms ease-out",
+  };
+
+  return (
+    <div
+      className={`relative rounded-full border border-emerald-100 bg-white shadow-sm ${
+        isLarge ? "h-56 w-56" : "h-32 w-32"
+      }`}
+    >
+      <div
+        className="absolute left-1/2 top-1/2 w-0.5 -translate-x-1/2 -translate-y-full rounded-full bg-emerald-200"
+        style={{ height: `${crossLength}px` }}
+      />
+      <div
+        className="absolute left-1/2 top-1/2 h-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-200"
+        style={{ width: `${crossLength * 2}px` }}
+      />
+
+      <div className="absolute left-1/2 top-1/2 z-20" style={needleStyle}>
+        <div
+          className="absolute left-1/2 top-1/2 w-0.5 rounded-full bg-emerald-600"
+          style={needleShaftStyle}
+        />
+        <div className="absolute left-1/2 top-1/2" style={needleHeadStyle} />
+      </div>
+
+      <div
+        className="absolute left-1/2 top-1/2 z-30 rounded-full bg-emerald-600"
+        style={{
+          width: `${centerDot}px`,
+          height: `${centerDot}px`,
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+      <div
+        className={`absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-200 bg-emerald-50 font-semibold text-emerald-700 ${
+          isLarge ? "px-2 py-0.5 text-[10px]" : "px-1.5 py-0.5 text-[9px]"
+        }`}
+        style={qiblaMarkerStyle}
+      >
+        K
+      </div>
+
+      <span
+        className={`absolute left-1/2 -translate-x-1/2 font-semibold text-textSecondary ${
+          isLarge ? "-top-2 text-xs" : "-top-2 text-[10px]"
+        }`}
+      >
+        N
+      </span>
+      <span
+        className={`absolute left-1/2 -translate-x-1/2 text-textSecondary ${
+          isLarge ? "-bottom-2 text-xs" : "-bottom-2 text-[10px]"
+        }`}
+      >
+        S
+      </span>
+      <span
+        className={`absolute top-1/2 -translate-y-1/2 text-textSecondary ${
+          isLarge ? "left-0 text-xs" : "left-0 text-[10px]"
+        }`}
+      >
+        W
+      </span>
+      <span
+        className={`absolute top-1/2 -translate-y-1/2 text-textSecondary ${
+          isLarge ? "right-0 text-xs" : "right-0 text-[10px]"
+        }`}
+      >
+        E
+      </span>
+    </div>
+  );
 };
 
 const SholatPage = () => {
+  const compassDialogId = useId();
+  const compassDialogTitleId = useId();
   const [query, setQuery] = useState("");
   const debounced = useDebouncedValue(query, 300);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -104,6 +231,10 @@ const SholatPage = () => {
   const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioStopTimeoutRef = useRef<number | null>(null);
+  const searchRequestRef = useRef(0);
+  const scheduleRequestRef = useRef(0);
+  const qiblaOperationRef = useRef(0);
+  const geocodeAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const saved = readStorage<LocationItem | null>(STORAGE_KEY, null);
@@ -123,60 +254,84 @@ const SholatPage = () => {
     if (!debounced || debounced.length < 2) {
       setResults([]);
       setSearchError(null);
+      setSearchLoading(false);
       return;
     }
 
-    let active = true;
+    const requestId = searchRequestRef.current + 1;
+    searchRequestRef.current = requestId;
+    const controller = new AbortController();
     setSearchLoading(true);
     setSearchError(null);
 
     fetchJson<LocationItem[]>(
       `/sholat/kabkota/cari/${encodeURIComponent(debounced)}`,
+      { signal: controller.signal },
     )
       .then((res) => {
-        if (!active) return;
+        if (requestId !== searchRequestRef.current) return;
         setResults(res.data ?? []);
       })
       .catch((err: Error) => {
-        if (!active) return;
+        if (requestId !== searchRequestRef.current) return;
+        if (controller.signal.aborted) return;
         setSearchError(err.message);
       })
       .finally(() => {
-        if (!active) return;
+        if (requestId !== searchRequestRef.current) return;
         setSearchLoading(false);
       });
 
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [debounced]);
 
-  const loadSchedule = (loc: LocationItem, mode: Period) => {
+  useEffect(() => {
+    if (!selected) {
+      setSchedule(null);
+      setScheduleLoading(false);
+      setScheduleError(null);
+      return;
+    }
+
+    const requestId = scheduleRequestRef.current + 1;
+    scheduleRequestRef.current = requestId;
+
     setScheduleLoading(true);
     setScheduleError(null);
+    setSchedule(null);
 
     const today = new Date();
+    const monthId = formatMonthId(today);
+    const todayId = formatDateId(today);
     const endpoint =
-      mode === "today"
-        ? `/sholat/jadwal/${loc.id}/today`
-        : `/sholat/jadwal/${loc.id}/${formatMonthId(today)}`;
+      period === "today"
+        ? `/sholat/jadwal/${selected.id}/today`
+        : `/sholat/jadwal/${selected.id}/${monthId}`;
+    const cacheKey =
+      period === "today"
+        ? `sholat-jadwal-${selected.id}-today-${todayId}`
+        : `sholat-jadwal-${selected.id}-month-${monthId}`;
+    const ttlSeconds = period === "today" ? 30 * 60 : 6 * 60 * 60;
 
-    fetchJson<SholatScheduleData>(endpoint)
+    fetchJsonCached<SholatScheduleData>(endpoint, {
+      ttl: ttlSeconds,
+      key: cacheKey,
+      staleIfError: true,
+    })
       .then((res) => {
+        if (requestId !== scheduleRequestRef.current) return;
         setSchedule(res.data ?? null);
       })
       .catch((err: Error) => {
+        if (requestId !== scheduleRequestRef.current) return;
         setScheduleError(err.message);
       })
       .finally(() => {
+        if (requestId !== scheduleRequestRef.current) return;
         setScheduleLoading(false);
       });
-  };
-
-  useEffect(() => {
-    if (selected) {
-      loadSchedule(selected, period);
-    }
   }, [selected, period]);
 
   useEffect(() => {
@@ -188,18 +343,77 @@ const SholatPage = () => {
     writeStorage(STORAGE_KEY, item);
   };
 
-  const fetchGeocode = async (queryText: string) => {
+  const isCurrentQiblaOperation = (operationId: number) =>
+    qiblaOperationRef.current === operationId;
+
+  const startQiblaOperation = () => {
+    qiblaOperationRef.current += 1;
+    geocodeAbortRef.current?.abort();
+    geocodeAbortRef.current = null;
+    return qiblaOperationRef.current;
+  };
+
+  const fetchQibla = async (
+    lat: number,
+    lon: number,
+    options?: { skipLoading?: boolean; operationId?: number },
+  ) => {
+    const operationId = options?.operationId ?? startQiblaOperation();
+    if (!options?.skipLoading) {
+      if (!isCurrentQiblaOperation(operationId)) return;
+      setQiblaLoading(true);
+      setQiblaError(null);
+    }
+    try {
+      const direction = calculateQiblaDirection(lat, lon);
+      if (!isCurrentQiblaOperation(operationId)) return;
+      if (!Number.isFinite(direction)) {
+        setQibla(null);
+        setQiblaError("Data arah kiblat tidak valid.");
+        return;
+      }
+      setQibla({
+        latitude: lat,
+        longitude: lon,
+        direction,
+      });
+      setQiblaError(null);
+    } catch (err) {
+      if (!isCurrentQiblaOperation(operationId)) return;
+      setQibla(null);
+      setQiblaError((err as Error).message);
+    } finally {
+      if (!options?.skipLoading && isCurrentQiblaOperation(operationId)) {
+        setQiblaLoading(false);
+      }
+    }
+  };
+
+  const fetchGeocode = async (
+    queryText: string,
+    operationId = startQiblaOperation(),
+  ) => {
+    if (!isCurrentQiblaOperation(operationId)) return;
     setQiblaLoading(true);
     setQiblaError(null);
     setQiblaNotice(null);
+    const controller = new AbortController();
+    geocodeAbortRef.current = controller;
+
     try {
-      const enhancedQuery = queryText.toLowerCase().includes("indonesia")
-        ? queryText
-        : `${queryText}, Indonesia`;
+      const cleanedQuery = queryText
+        .replace(/\b(kab\.?|kabupaten|kota)\b\.?\s*/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      const enhancedQuery = cleanedQuery.toLowerCase().includes("indonesia")
+        ? cleanedQuery
+        : `${cleanedQuery}, Indonesia`;
       const res = await fetchJson<unknown>("/tools/geocode", {
         method: "POST",
         body: JSON.stringify({ query: enhancedQuery }),
+        signal: controller.signal,
       });
+      if (!isCurrentQiblaOperation(operationId)) return;
       const payload = res.data;
       const entry = Array.isArray(payload) ? payload[0] : payload;
       const latRaw = (entry as { lat?: string | number })?.lat;
@@ -209,12 +423,14 @@ const SholatPage = () => {
         (entry as { name?: string })?.name ??
         queryText;
       if (latRaw == null || lonRaw == null) {
+        setQibla(null);
         setQiblaError("Koordinat lokasi tidak ditemukan.");
         return;
       }
       const lat = parseCoordinate(latRaw);
       const lon = parseCoordinate(lonRaw);
       if (lat == null || lon == null) {
+        setQibla(null);
         setQiblaError("Koordinat lokasi tidak valid.");
         return;
       }
@@ -222,11 +438,27 @@ const SholatPage = () => {
       setLatInput(lat.toFixed(6));
       setLonInput(lon.toFixed(6));
       setQiblaNotice(`Menggunakan lokasi terpilih: ${labelRaw}`);
-      await fetchQibla(lat, lon, { skipLoading: true });
+      await fetchQibla(lat, lon, { skipLoading: true, operationId });
     } catch (err) {
+      if (controller.signal.aborted) return;
+      if (!isCurrentQiblaOperation(operationId)) return;
+      if (typeof navigator !== "undefined" && navigator.onLine === false) {
+        setQibla(null);
+        setQiblaError(null);
+        setQiblaNotice(
+          "Mode offline: arah kiblat butuh koneksi atau masukkan koordinat manual.",
+        );
+        return;
+      }
+      setQibla(null);
       setQiblaError((err as Error).message);
     } finally {
-      setQiblaLoading(false);
+      if (geocodeAbortRef.current === controller) {
+        geocodeAbortRef.current = null;
+      }
+      if (isCurrentQiblaOperation(operationId)) {
+        setQiblaLoading(false);
+      }
     }
   };
 
@@ -234,33 +466,6 @@ const SholatPage = () => {
     if (!selected) return;
     fetchGeocode(selected.lokasi);
   }, [selected]);
-
-  const fetchQibla = async (
-    lat: number,
-    lon: number,
-    options?: { skipLoading?: boolean },
-  ) => {
-    if (!options?.skipLoading) {
-      setQiblaLoading(true);
-      setQiblaError(null);
-    }
-    try {
-      const res = await fetchJson<unknown>(`/qibla/${lat},${lon}`);
-      const normalized = normalizeQibla(res.data);
-      if (!normalized) {
-        setQibla(null);
-        setQiblaError("Data arah kiblat tidak valid.");
-        return;
-      }
-      setQibla(normalized);
-    } catch (err) {
-      setQiblaError((err as Error).message);
-    } finally {
-      if (!options?.skipLoading) {
-        setQiblaLoading(false);
-      }
-    }
-  };
 
   const handleUseLocation = () => {
     if (typeof window !== "undefined" && window.isSecureContext === false) {
@@ -273,11 +478,15 @@ const SholatPage = () => {
       setQiblaError("Geolocation tidak tersedia di perangkat ini.");
       return;
     }
+    const operationId = startQiblaOperation();
+    if (!isCurrentQiblaOperation(operationId)) return;
     setQiblaLoading(true);
     setQiblaError(null);
     setQiblaNotice(null);
+    setQiblaAccuracy(null);
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        if (!isCurrentQiblaOperation(operationId)) return;
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         setQiblaAccuracy(position.coords.accuracy ?? null);
@@ -285,11 +494,12 @@ const SholatPage = () => {
         setLatInput(lat.toFixed(6));
         setLonInput(lon.toFixed(6));
         setQiblaNotice("Menggunakan lokasi perangkat.");
-        fetchQibla(lat, lon);
+        fetchQibla(lat, lon, { operationId });
       },
       (err) => {
+        if (!isCurrentQiblaOperation(operationId)) return;
         if ((err.code === 2 || err.code === 3) && selected) {
-          fetchGeocode(selected.lokasi);
+          fetchGeocode(selected.lokasi, operationId);
           return;
         }
         setQiblaLoading(false);
@@ -309,16 +519,19 @@ const SholatPage = () => {
   };
 
   const handleManualQibla = () => {
+    const operationId = startQiblaOperation();
+    if (!isCurrentQiblaOperation(operationId)) return;
     const lat = parseCoordinate(latInput);
     const lon = parseCoordinate(lonInput);
     if (lat == null || lon == null) {
+      setQibla(null);
       setQiblaError("Masukkan latitude dan longitude yang valid.");
       return;
     }
     setQiblaAccuracy(null);
     setQiblaLabel("Koordinat manual");
     setQiblaNotice("Menggunakan koordinat manual.");
-    fetchQibla(lat, lon);
+    fetchQibla(lat, lon, { operationId });
   };
 
   const copyCoordinates = async () => {
@@ -361,10 +574,28 @@ const SholatPage = () => {
       fired: [],
     });
   });
+  const lastFiredRef = useRef(lastFired);
 
   useEffect(() => {
+    lastFiredRef.current = lastFired;
     writeStorage(ADZAN_LAST_FIRED_KEY, lastFired);
   }, [lastFired]);
+
+  useEffect(() => {
+    return () => {
+      geocodeAbortRef.current?.abort();
+      geocodeAbortRef.current = null;
+      if (audioStopTimeoutRef.current) {
+        window.clearTimeout(audioStopTimeoutRef.current);
+        audioStopTimeoutRef.current = null;
+      }
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, []);
 
   const requestNotificationPermission = async () => {
     if (typeof window === "undefined") return;
@@ -440,11 +671,13 @@ const SholatPage = () => {
     const checkAndFire = () => {
       const now = new Date();
       const todayId = formatDateId(now);
+      const currentLastFired = lastFiredRef.current;
       const activeLastFired =
-        lastFired.dateId === todayId
-          ? lastFired
+        currentLastFired.dateId === todayId
+          ? currentLastFired
           : { dateId: todayId, fired: [] };
-      if (activeLastFired !== lastFired) {
+      if (activeLastFired !== currentLastFired) {
+        lastFiredRef.current = activeLastFired;
         setLastFired(activeLastFired);
       }
 
@@ -489,10 +722,23 @@ const SholatPage = () => {
           }
         }
 
-        setLastFired((prev) => ({
-          dateId: todayId,
-          fired: [...prev.fired, firedKey],
-        }));
+        setLastFired((prev) => {
+          const baseFired = prev.dateId === todayId ? prev.fired : [];
+          if (baseFired.includes(firedKey)) {
+            const next =
+              prev.dateId === todayId
+                ? prev
+                : { dateId: todayId, fired: baseFired };
+            lastFiredRef.current = next;
+            return next;
+          }
+          const next = {
+            dateId: todayId,
+            fired: [...baseFired, firedKey],
+          };
+          lastFiredRef.current = next;
+          return next;
+        });
       });
     };
 
@@ -524,7 +770,7 @@ const SholatPage = () => {
       }, delay);
     };
 
-    let timeoutId = window.setTimeout(() => {});
+    let timeoutId: number | null = null;
     const intervalId = window.setInterval(checkAndFire, 300000);
     checkAndFire();
     scheduleNext();
@@ -541,16 +787,13 @@ const SholatPage = () => {
 
     return () => {
       window.clearInterval(intervalId);
-      window.clearTimeout(timeoutId);
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
       document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [
-    adzanSettings.mode,
-    adzanSettings.durationSec,
-    lastFired,
-    todaysSchedule,
-  ]);
+  }, [adzanSettings.mode, adzanSettings.durationSec, todaysSchedule]);
 
   return (
     <div className="py-10">
@@ -588,10 +831,12 @@ const SholatPage = () => {
                   key={item.id}
                   type="button"
                   onClick={() => handleSelect(item)}
-                  className="flex w-full items-center justify-between rounded-xl border border-emerald-100 px-4 py-3 text-left text-sm hover:bg-emerald-50"
+                  className="flex w-full items-center justify-between gap-3 rounded-xl border border-emerald-100 px-4 py-3 text-left text-sm hover:bg-emerald-50"
                 >
-                  <span>{item.lokasi}</span>
-                  <MapPin className="h-4 w-4 text-emerald-600" />
+                  <span className="min-w-0 flex-1 break-words">
+                    {item.lokasi}
+                  </span>
+                  <MapPin className="h-4 w-4 shrink-0 text-emerald-600" />
                 </button>
               ))}
             </div>
@@ -864,7 +1109,7 @@ const SholatPage = () => {
                     onClick={() => fetchGeocode(selected.lokasi)}
                     className="w-full rounded-full border border-emerald-200 px-4 py-2 text-xs font-semibold text-emerald-700 sm:w-auto"
                   >
-                    Gunakan Lokasi Terpilih
+                    Gunakan Lokasi Disimpan
                   </button>
                 ) : null}
               </div>
@@ -909,30 +1154,7 @@ const SholatPage = () => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                      <div className="relative h-32 w-32 rounded-full border border-emerald-100 bg-white shadow-sm">
-                        <div className="absolute left-1/2 top-1/2 h-12 w-0.5 -translate-x-1/2 -translate-y-full rounded-full bg-emerald-200" />
-                        <div className="absolute left-1/2 top-1/2 h-12 w-0.5 -translate-x-1/2 -translate-y-full rounded-full bg-emerald-200 rotate-90" />
-                        <Navigation2
-                          className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 text-emerald-600"
-                          style={
-                            {
-                              "--tw-rotate": `${qibla.direction}deg`,
-                            } as CSSProperties
-                          }
-                        />
-                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-textSecondary">
-                          N
-                        </span>
-                        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-textSecondary">
-                          S
-                        </span>
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 text-[10px] text-textSecondary">
-                          W
-                        </span>
-                        <span className="absolute right-0 top-1/2 -translate-y-1/2 text-[10px] text-textSecondary">
-                          E
-                        </span>
-                      </div>
+                      <QiblaCompass direction={qibla.direction} size="sm" />
                     </div>
                     <div className="flex flex-wrap justify-center gap-2">
                       <button
@@ -946,6 +1168,9 @@ const SholatPage = () => {
                         type="button"
                         onClick={() => setShowCompass(true)}
                         className="rounded-full border border-emerald-200 px-4 py-2 text-xs font-semibold text-emerald-700 lg:hidden"
+                        aria-haspopup="dialog"
+                        aria-expanded={showCompass}
+                        aria-controls={compassDialogId}
                       >
                         Kompas Besar
                       </button>
@@ -963,12 +1188,19 @@ const SholatPage = () => {
           onClick={() => setShowCompass(false)}
         >
           <div
+            id={compassDialogId}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={compassDialogTitleId}
             className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-card"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-textPrimary">
+                <p
+                  id={compassDialogTitleId}
+                  className="text-sm font-semibold text-textPrimary"
+                >
                   Kompas Kiblat
                 </p>
                 {qiblaLabel ? (
@@ -984,30 +1216,7 @@ const SholatPage = () => {
               </button>
             </div>
             <div className="mt-6 flex items-center justify-center">
-              <div className="relative h-56 w-56 rounded-full border border-emerald-100 bg-white shadow-sm">
-                <div className="absolute left-1/2 top-1/2 h-20 w-0.5 -translate-x-1/2 -translate-y-full rounded-full bg-emerald-200" />
-                <div className="absolute left-1/2 top-1/2 h-20 w-0.5 -translate-x-1/2 -translate-y-full rounded-full bg-emerald-200 rotate-90" />
-                <Navigation2
-                  className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 text-emerald-600"
-                  style={
-                    {
-                      "--tw-rotate": `${qibla.direction}deg`,
-                    } as CSSProperties
-                  }
-                />
-                <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-semibold text-textSecondary">
-                  N
-                </span>
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-textSecondary">
-                  S
-                </span>
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xs text-textSecondary">
-                  W
-                </span>
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-textSecondary">
-                  E
-                </span>
-              </div>
+              <QiblaCompass direction={qibla.direction} size="lg" />
             </div>
             <p className="mt-4 text-center text-sm text-textSecondary">
               {qibla.direction.toFixed(2)}° dari utara (searah jarum jam)

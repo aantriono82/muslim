@@ -55,6 +55,7 @@ export type AyahItem = {
   ayah_number: number;
   arab: string;
   translation: string;
+  asbabun_nuzul?: string | null;
   audio_url?: string | null;
   image_url?: string | null;
   tafsir?: {

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import users from "./users";
 
-const app = new Hono().basePath("/api");
+export const app = new Hono().basePath("/api");
 
 app.onError((err, c) => {
   console.error(err);
@@ -12,10 +12,15 @@ app.get("/", (c) => c.json({ status: true, message: "API berjalan." }));
 
 app.route("/users", users);
 
-const port = Number(process.env.PORT ?? 3000);
-console.log(`Server berjalan di http://localhost:${port}/api`);
+const port = Number(process.env.PORT ?? 4001);
 
-Bun.serve({
-  port,
-  fetch: app.fetch,
-});
+if (import.meta.main) {
+  console.log(`Server berjalan di http://localhost:${port}/api`);
+
+  Bun.serve({
+    port,
+    fetch: app.fetch,
+  });
+}
+
+export default app;

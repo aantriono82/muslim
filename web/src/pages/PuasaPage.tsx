@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
@@ -211,6 +211,9 @@ const PuasaPage = () => {
   const [ceToHijri, setCeToHijri] = useState<
     Record<string, CalendarInfo | null>
   >({});
+  const todayRequestRef = useRef(0);
+  const hijriInFlightRef = useRef<Set<string>>(new Set());
+  const ceInFlightRef = useRef<Set<string>>(new Set());
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
@@ -226,6 +229,9 @@ const PuasaPage = () => {
   );
 
   useEffect(() => {
+    const requestId = todayRequestRef.current + 1;
+    todayRequestRef.current = requestId;
+    let active = true;
     setLoading(true);
     setError(null);
     fetchJsonCached<CalendarData>(todayPath, {
@@ -233,9 +239,21 @@ const PuasaPage = () => {
       key: `puasa-today-${method}-${adjustment}`,
       staleIfError: true,
     })
-      .then((res) => setToday(res.data ?? null))
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (!active || requestId !== todayRequestRef.current) return;
+        setToday(res.data ?? null);
+      })
+      .catch((err: Error) => {
+        if (!active || requestId !== todayRequestRef.current) return;
+        setError(err.message);
+      })
+      .finally(() => {
+        if (!active || requestId !== todayRequestRef.current) return;
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [adjustment, method, todayPath]);
 
   useEffect(() => {
@@ -303,9 +321,13 @@ const PuasaPage = () => {
   useEffect(() => {
     if (fixedHijriDates.length === 0) return;
     let active = true;
+    const requestedKeys: string[] = [];
     fixedHijriDates.forEach((date) => {
       const cacheKey = `${date}|${method}|${adjustment}`;
       if (hijriToCe[cacheKey] !== undefined) return;
+      if (hijriInFlightRef.current.has(cacheKey)) return;
+      hijriInFlightRef.current.add(cacheKey);
+      requestedKeys.push(cacheKey);
       fetchJsonCached<CalendarData>(`/cal/ce/${date}?${query}`, {
         ttl: 12 * 60 * 60,
         key: `puasa-hijr-${cacheKey}`,
@@ -313,27 +335,43 @@ const PuasaPage = () => {
       })
         .then((res) => {
           if (!active) return;
-          setHijriToCe((prev) => ({
-            ...prev,
-            [cacheKey]: res.data?.ce ?? null,
-          }));
+          setHijriToCe((prev) =>
+            prev[cacheKey] !== undefined
+              ? prev
+              : {
+                  ...prev,
+                  [cacheKey]: res.data?.ce ?? null,
+                },
+          );
         })
         .catch(() => {
           if (!active) return;
-          setHijriToCe((prev) => ({ ...prev, [cacheKey]: null }));
+          setHijriToCe((prev) =>
+            prev[cacheKey] !== undefined ? prev : { ...prev, [cacheKey]: null },
+          );
+        })
+        .finally(() => {
+          hijriInFlightRef.current.delete(cacheKey);
         });
     });
     return () => {
       active = false;
+      requestedKeys.forEach((cacheKey) => {
+        hijriInFlightRef.current.delete(cacheKey);
+      });
     };
   }, [adjustment, fixedHijriDates, hijriToCe, method, query]);
 
   useEffect(() => {
     if (ceDates.length === 0) return;
     let active = true;
+    const requestedKeys: string[] = [];
     ceDates.forEach((date) => {
       const cacheKey = `${date}|${method}|${adjustment}`;
       if (ceToHijri[cacheKey] !== undefined) return;
+      if (ceInFlightRef.current.has(cacheKey)) return;
+      ceInFlightRef.current.add(cacheKey);
+      requestedKeys.push(cacheKey);
       fetchJsonCached<CalendarData>(`/cal/hijr/${date}?${query}`, {
         ttl: 12 * 60 * 60,
         key: `puasa-ce-${cacheKey}`,
@@ -341,18 +379,30 @@ const PuasaPage = () => {
       })
         .then((res) => {
           if (!active) return;
-          setCeToHijri((prev) => ({
-            ...prev,
-            [cacheKey]: res.data?.hijr ?? null,
-          }));
+          setCeToHijri((prev) =>
+            prev[cacheKey] !== undefined
+              ? prev
+              : {
+                  ...prev,
+                  [cacheKey]: res.data?.hijr ?? null,
+                },
+          );
         })
         .catch(() => {
           if (!active) return;
-          setCeToHijri((prev) => ({ ...prev, [cacheKey]: null }));
+          setCeToHijri((prev) =>
+            prev[cacheKey] !== undefined ? prev : { ...prev, [cacheKey]: null },
+          );
+        })
+        .finally(() => {
+          ceInFlightRef.current.delete(cacheKey);
         });
     });
     return () => {
       active = false;
+      requestedKeys.forEach((cacheKey) => {
+        ceInFlightRef.current.delete(cacheKey);
+      });
     };
   }, [adjustment, ceDates, ceToHijri, method, query]);
 
@@ -606,7 +656,7 @@ const PuasaPage = () => {
       <Container>
         <SectionHeader
           title="Puasa"
-          subtitle="Daftar puasa wajib & sunnah lengkap dengan tanggal Masehi dan Hijriah."
+          subtitle="Puasa wajib & sunnah lengkap dengan tanggal Masehi dan Hijriah."
         />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">

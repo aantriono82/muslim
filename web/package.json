@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run src",
+    "generate:matsurat-ayahs": "bun scripts/generate-matsurat-surah-ayahs.mjs",
     "test:visual": "playwright test",
+    "test:pwa": "playwright test -c playwright.pwa.config.ts",
     "test:visual:update": "playwright test --update-snapshots",
     "deploy:cloudflare": "test -n \"$CF_PAGES_PROJECT\" || { echo \"Set CF_PAGES_PROJECT terlebih dulu\"; exit 1; }; vite build && npx wrangler pages deploy dist --project-name \"$CF_PAGES_PROJECT\""
   },

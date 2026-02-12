@@ -206,20 +206,20 @@ const HomePage = () => {
               ibadah dengan lebih tenang, mulai dari jadwal sholat, Al-Qur'an,
               hingga kalkulator zakat.
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/sholat"
-                className="w-full rounded-full bg-emerald-600 px-5 py-2 text-center text-sm font-semibold text-white shadow sm:w-auto"
-              >
-                Mulai dari Sholat
-              </Link>
-              <Link
-                to="/quran"
-                className="w-full rounded-full border border-emerald-200 px-5 py-2 text-center text-sm font-semibold text-emerald-700 sm:w-auto"
-              >
-                Baca Al-Qur'an
-              </Link>
-              <div className="relative w-full sm:w-auto">
+            <div className="mt-6 sm:relative">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  to="/sholat"
+                  className="w-full rounded-full bg-emerald-600 px-5 py-2 text-center text-sm font-semibold text-white shadow sm:w-auto"
+                >
+                  Mulai dari Sholat
+                </Link>
+                <Link
+                  to="/quran"
+                  className="w-full rounded-full border border-emerald-200 px-5 py-2 text-center text-sm font-semibold text-emerald-700 sm:w-auto"
+                >
+                  Baca Al-Qur'an
+                </Link>
                 <button
                   ref={dateInfoButtonRef}
                   type="button"
@@ -234,45 +234,45 @@ const HomePage = () => {
                     ? "Sembunyikan Tanggal"
                     : "Lihat Tanggal Hari Ini"}
                 </button>
-                {showDateInfo ? (
-                  <div
-                    ref={dateInfoPopoverRef}
-                    id={dateInfoId}
-                    role="dialog"
-                    aria-label="Tanggal hari ini"
-                    className="mt-2 w-full sm:absolute sm:right-0 sm:top-full sm:z-20 sm:w-[420px]"
-                  >
-                    <Card className="border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-sky-50 shadow-card">
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-xl border border-emerald-100 bg-white/80 px-4 py-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                            Tanggal Hijriyah
-                          </p>
-                          <p className="mt-2 text-sm font-semibold leading-relaxed text-emerald-900">
-                            {hijriDateTimeText}
-                          </p>
-                        </div>
-                        <div className="rounded-xl border border-sky-100 bg-white/80 px-4 py-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">
-                            Tanggal Masehi
-                          </p>
-                          <p className="mt-2 text-sm font-semibold leading-relaxed text-sky-900">
-                            {gregorianDateTimeText}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-3">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-                          Jam Perangkat
-                        </p>
-                        <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-900">
-                          {currentTimeText}
-                        </p>
-                      </div>
-                    </Card>
-                  </div>
-                ) : null}
               </div>
+              {showDateInfo ? (
+                <div
+                  ref={dateInfoPopoverRef}
+                  id={dateInfoId}
+                  role="dialog"
+                  aria-label="Tanggal hari ini"
+                  className="mt-2 w-full sm:absolute sm:left-0 sm:top-full sm:z-20 sm:max-w-[calc(100vw-2rem)] md:w-[560px]"
+                >
+                  <Card className="border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-sky-50 shadow-card">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-xl border border-emerald-100 bg-white/80 px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                          Tanggal Hijriyah
+                        </p>
+                        <p className="mt-2 whitespace-nowrap text-sm font-semibold text-emerald-900">
+                          {hijriDateTimeText}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-sky-100 bg-white/80 px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">
+                          Tanggal Masehi
+                        </p>
+                        <p className="mt-2 whitespace-nowrap text-sm font-semibold text-sky-900">
+                          {gregorianDateTimeText}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-3">
+                      <p className="text-center text-xs font-semibold uppercase tracking-wide text-slate-700">
+                        Jam Perangkat
+                      </p>
+                      <p className="mt-2 text-center text-sm font-semibold leading-relaxed text-slate-900">
+                        {currentTimeText}
+                      </p>
+                    </div>
+                  </Card>
+                </div>
+              ) : null}
             </div>
           </div>
           <div>

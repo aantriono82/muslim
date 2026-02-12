@@ -4,7 +4,10 @@ import { BrowserRouter } from "react-router-dom";
 import { registerSW } from "virtual:pwa-register";
 import App from "./App";
 import { AudioProvider } from "./lib/audio";
+import { initThemeMode } from "./lib/theme";
 import "./index.css";
+
+initThemeMode();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

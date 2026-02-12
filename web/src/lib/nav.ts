@@ -1,6 +1,6 @@
 import {
+  BookHeart,
   BookOpen,
-  CalendarDays,
   Heart,
   Home,
   LayoutGrid,
@@ -71,7 +71,7 @@ export const navItems = [
   {
     label: "Al\u00A0Matsurat",
     path: "/matsurat",
-    icon: BookOpen,
+    icon: BookHeart,
     iconColor: "text-teal-600",
     iconBg: "bg-teal-50",
   },
@@ -81,13 +81,6 @@ export const navItems = [
     icon: LayoutGrid,
     iconColor: "text-slate-600",
     iconBg: "bg-slate-100",
-  },
-  {
-    label: "Kalender",
-    path: "/kalender",
-    icon: CalendarDays,
-    iconColor: "text-lime-700",
-    iconBg: "bg-lime-50",
   },
 ];
 

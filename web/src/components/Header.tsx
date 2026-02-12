@@ -1,8 +1,14 @@
 import { useSyncExternalStore } from "react";
 import { NavLink } from "react-router-dom";
+import { MoonStar, Sun } from "lucide-react";
 import Container from "./Container";
 import { navItems } from "../lib/nav";
 import { getApiSource, getApiStatus, subscribeApiStatus } from "../lib/api";
+import {
+  getThemeMode,
+  subscribeThemeMode,
+  toggleThemeMode,
+} from "../lib/theme";
 
 const Header = () => {
   const status = useSyncExternalStore(
@@ -15,6 +21,12 @@ const Header = () => {
     getApiSource,
     getApiSource,
   );
+  const themeMode = useSyncExternalStore(
+    subscribeThemeMode,
+    getThemeMode,
+    getThemeMode,
+  );
+  const isDark = themeMode === "dark";
   const sourceLabel =
     source === "proxy"
       ? "Proxy"
@@ -66,6 +78,21 @@ const Header = () => {
                 className={`h-2.5 w-2.5 rounded-full ${sourceDot} ${dotPulse}`}
               />
             </span>
+            <button
+              type="button"
+              onClick={toggleThemeMode}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-white/80 text-textSecondary transition hover:text-emerald-700"
+              title={isDark ? "Ganti ke mode terang" : "Ganti ke mode gelap"}
+              aria-label={
+                isDark ? "Aktifkan mode terang" : "Aktifkan mode gelap"
+              }
+            >
+              {isDark ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <MoonStar className="h-4 w-4" />
+              )}
+            </button>
             <nav className="hidden items-center gap-3 lg:flex">
               {navItems.map((item) => (
                 <NavLink

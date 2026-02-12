@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Search, Shuffle } from "lucide-react";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
@@ -8,7 +8,7 @@ import {
   ErrorState,
   LoadingState,
 } from "../components/State";
-import { fetchJson, fetchJsonCached } from "../lib/api";
+import { ApiError, fetchJson, fetchJsonCached } from "../lib/api";
 import { useDebouncedValue } from "../lib/hooks";
 import { highlightText } from "../lib/highlight";
 import type {
@@ -47,8 +47,12 @@ const HadisPage = () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [jumpId, setJumpId] = useState("");
+  const detailRequestRef = useRef(0);
+  const detailAbortRef = useRef<AbortController | null>(null);
 
   const isSearch = debouncedKeyword.length >= 4;
+  const isAborted = (err: unknown) =>
+    err instanceof ApiError && err.code === "aborted";
 
   useEffect(() => {
     fetchJsonCached<HadisMeta>("/hadis/enc", {
@@ -67,6 +71,7 @@ const HadisPage = () => {
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setListLoading(true);
     setListError(null);
 
@@ -74,6 +79,7 @@ const HadisPage = () => {
       if (isSearch) {
         const res = await fetchJson<HadisSearchData>(
           `/hadis/enc/cari/${encodeURIComponent(debouncedKeyword)}?page=${page}&limit=10`,
+          { signal: controller.signal },
         );
         if (!active) return;
         setSearchEntries(res.data?.hadis ?? []);
@@ -81,6 +87,7 @@ const HadisPage = () => {
       } else {
         const res = await fetchJson<HadisExploreData>(
           `/hadis/enc/explore?page=${page}&limit=${limit}`,
+          { signal: controller.signal },
         );
         if (!active) return;
         setEntries(res.data?.hadis ?? []);
@@ -89,9 +96,11 @@ const HadisPage = () => {
     };
 
     load()
-      .catch((err: Error) => {
-        if (!active) return;
-        setListError(err.message);
+      .catch((err: unknown) => {
+        if (!active || isAborted(err)) return;
+        setListError(
+          err instanceof Error ? err.message : "Gagal memuat daftar hadis.",
+        );
       })
       .finally(() => {
         if (!active) return;
@@ -100,6 +109,7 @@ const HadisPage = () => {
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [debouncedKeyword, isSearch, page, limit]);
 
@@ -118,17 +128,22 @@ const HadisPage = () => {
   useEffect(() => {
     if (!selectedId) return;
     let active = true;
+    const controller = new AbortController();
     setDetailLoading(true);
     setDetailError(null);
 
-    fetchJson<HadisDetail>(`/hadis/enc/show/${selectedId}`)
+    fetchJson<HadisDetail>(`/hadis/enc/show/${selectedId}`, {
+      signal: controller.signal,
+    })
       .then((res) => {
         if (!active) return;
         setDetail(res.data ?? null);
       })
-      .catch((err: Error) => {
-        if (!active) return;
-        setDetailError(err.message);
+      .catch((err: unknown) => {
+        if (!active || isAborted(err)) return;
+        setDetailError(
+          err instanceof Error ? err.message : "Gagal memuat detail hadis.",
+        );
       })
       .finally(() => {
         if (!active) return;
@@ -137,46 +152,58 @@ const HadisPage = () => {
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [selectedId]);
 
-  const handleRandom = () => {
+  useEffect(
+    () => () => {
+      detailAbortRef.current?.abort();
+      detailAbortRef.current = null;
+    },
+    [],
+  );
+
+  const requestDetailByPath = (path: string) => {
+    detailAbortRef.current?.abort();
+    const controller = new AbortController();
+    detailAbortRef.current = controller;
+    const requestId = detailRequestRef.current + 1;
+    detailRequestRef.current = requestId;
     setDetailLoading(true);
     setDetailError(null);
-    fetchJson<HadisDetail>("/hadis/enc/random")
+
+    fetchJson<HadisDetail>(path, { signal: controller.signal })
       .then((res) => {
+        if (requestId !== detailRequestRef.current) return;
         setDetail(res.data ?? null);
         if (res.data?.id) setSelectedId(res.data.id);
       })
-      .catch((err: Error) => setDetailError(err.message))
-      .finally(() => setDetailLoading(false));
+      .catch((err: unknown) => {
+        if (requestId !== detailRequestRef.current || isAborted(err)) return;
+        setDetailError(
+          err instanceof Error ? err.message : "Gagal memuat detail hadis.",
+        );
+      })
+      .finally(() => {
+        if (requestId !== detailRequestRef.current) return;
+        setDetailLoading(false);
+      });
+  };
+
+  const handleRandom = () => {
+    requestDetailByPath("/hadis/enc/random");
   };
 
   const handleSibling = (type: "next" | "prev") => {
     if (!detail?.id) return;
-    setDetailLoading(true);
-    setDetailError(null);
-    fetchJson<HadisDetail>(`/hadis/enc/${type}/${detail.id}`)
-      .then((res) => {
-        setDetail(res.data ?? null);
-        if (res.data?.id) setSelectedId(res.data.id);
-      })
-      .catch((err: Error) => setDetailError(err.message))
-      .finally(() => setDetailLoading(false));
+    requestDetailByPath(`/hadis/enc/${type}/${detail.id}`);
   };
 
   const handleJump = () => {
     const id = Number.parseInt(jumpId, 10);
     if (!Number.isFinite(id) || id <= 0) return;
-    setDetailLoading(true);
-    setDetailError(null);
-    fetchJson<HadisDetail>(`/hadis/enc/show/${id}`)
-      .then((res) => {
-        setDetail(res.data ?? null);
-        if (res.data?.id) setSelectedId(res.data.id);
-      })
-      .catch((err: Error) => setDetailError(err.message))
-      .finally(() => setDetailLoading(false));
+    requestDetailByPath(`/hadis/enc/show/${id}`);
   };
 
   return (
@@ -257,7 +284,7 @@ const HadisPage = () => {
                 ) : null}
 
                 <div className="max-h-none space-y-3 overflow-visible pr-0 -mr-0 lg:max-h-[60vh] lg:overflow-y-auto lg:pr-3 lg:-mr-3">
-                  <div className="hidden lg:sticky lg:top-0 lg:z-10 lg:mb-2 lg:flex lg:items-center lg:justify-between lg:rounded-lg lg:border lg:border-emerald-100 lg:bg-white/90 lg:px-3 lg:py-2 lg:text-[11px] lg:text-textSecondary lg:backdrop-blur">
+                  <div className="hidden bg-white/90 lg:sticky lg:top-0 lg:z-10 lg:mb-2 lg:flex lg:items-center lg:justify-between lg:rounded-lg lg:border lg:border-emerald-100 lg:bg-white/90 lg:px-3 lg:py-2 lg:text-[11px] lg:text-textSecondary lg:backdrop-blur">
                     <span>{listLabel}</span>
                     <span>{listIds.length} item</span>
                   </div>
@@ -269,7 +296,7 @@ const HadisPage = () => {
                             key={item.id}
                             type="button"
                             onClick={() => setSelectedId(item.id)}
-                            className={`cv-auto w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
+                            className={`cv-auto w-full rounded-xl border bg-white/90 px-4 py-3 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 [-webkit-tap-highlight-color:transparent] ${
                               selectedId === item.id
                                 ? "border-emerald-500 bg-emerald-50"
                                 : "border-emerald-100 hover:bg-emerald-50"
@@ -297,7 +324,7 @@ const HadisPage = () => {
                             key={item.id}
                             type="button"
                             onClick={() => setSelectedId(item.id)}
-                            className={`cv-auto w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
+                            className={`cv-auto w-full rounded-xl border bg-white/90 px-4 py-3 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 [-webkit-tap-highlight-color:transparent] ${
                               selectedId === item.id
                                 ? "border-emerald-500 bg-emerald-50"
                                 : "border-emerald-100 hover:bg-emerald-50"
@@ -365,7 +392,7 @@ const HadisPage = () => {
             {detail ? (
               <div className="mt-4 space-y-4">
                 <div>
-                  <p className="text-xs text-emerald-700">Hadis #{detail.id}</p>
+                  <p className="text-xs text-emerald-700">ID #{detail.id}</p>
                   <p
                     className="mt-2 text-right font-arabic text-lg leading-relaxed text-textPrimary"
                     dir="rtl"

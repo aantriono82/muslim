@@ -618,3 +618,51 @@ test("haji", async ({ page }) => {
   await page.getByText("Manasik Ringkas per Hari").waitFor();
   await snapshot(page, "haji.png");
 });
+
+test("disclaimer", async ({ page }) => {
+  await page.goto("/disclaimer");
+  await page.getByRole("heading", { name: "Disclaimer" }).waitFor();
+  await snapshot(page, "disclaimer.png");
+});
+
+test("no-horizontal-overflow-core-routes", async ({ page }) => {
+  const routes = [
+    "/",
+    "/sholat",
+    "/quran",
+    "/quran/2",
+    "/quran/2/1",
+    "/murratal",
+    "/haji",
+    "/puasa",
+    "/hadis",
+    "/doa",
+    "/waris",
+    "/zakat",
+    "/matsurat",
+    "/disclaimer",
+  ];
+
+  for (const route of routes) {
+    await page.goto(route);
+    if (route === "/quran") {
+      await page.getByRole("button", { name: "Surah" }).click();
+      await page.getByText("Al-Fatihah").waitFor();
+    }
+
+    const dimensions = await page.evaluate(() => {
+      const viewport = window.innerWidth;
+      const htmlWidth = document.documentElement.scrollWidth;
+      const bodyWidth = document.body?.scrollWidth ?? 0;
+      return {
+        viewport,
+        maxWidth: Math.max(htmlWidth, bodyWidth),
+      };
+    });
+
+    expect(
+      dimensions.maxWidth,
+      `${route} has horizontal overflow: content ${dimensions.maxWidth}px > viewport ${dimensions.viewport}px`,
+    ).toBeLessThanOrEqual(dimensions.viewport + 1);
+  }
+});

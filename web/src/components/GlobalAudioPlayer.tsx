@@ -1,13 +1,11 @@
 import {
-  Download,
   Pause,
   Play,
-  Repeat,
-  Shuffle,
   SkipBack,
   SkipForward,
   Square,
   X,
+  Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAudio } from "../lib/audio";
@@ -47,7 +45,11 @@ const EQ_PRESETS = {
 
 type EqPreset = keyof typeof EQ_PRESETS | "Custom";
 
-const GlobalAudioPlayer = () => {
+type GlobalAudioPlayerProps = {
+  embedded?: boolean;
+};
+
+const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
   const {
     track,
     queue,
@@ -56,8 +58,6 @@ const GlobalAudioPlayer = () => {
     playbackRate,
     repeatMode,
     lastAction,
-    history,
-    lastByModule,
     setTrack,
     next,
     prev,
@@ -65,7 +65,10 @@ const GlobalAudioPlayer = () => {
     setPlaybackRate,
     setRepeatMode,
     jumpTo,
-    setQueueByTrack,
+    progress,
+    duration,
+    setProgress,
+    setDuration,
   } = useAudio();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -88,6 +91,9 @@ const GlobalAudioPlayer = () => {
   const [sleepEndsAt, setSleepEndsAt] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const [resumeTime, setResumeTime] = useState<number | null>(null);
+  const [volume, setVolume] = useState(100);
+  const [balance, setBalance] = useState(0);
+  const [showEq, setShowEq] = useState(true);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [eqEnabled, setEqEnabled] = useState(true);
@@ -100,6 +106,7 @@ const GlobalAudioPlayer = () => {
   const [preamp, setPreamp] = useState(0);
   const [limiterEnabled, setLimiterEnabled] = useState(true);
   const limiterEnabledRef = useRef(limiterEnabled);
+  const pannerRef = useRef<StereoPannerNode | null>(null);
   const [prevActionLabel, setPrevActionLabel] = useState<string | null>(null);
   const [autoplayLast, setAutoplayLast] = useState(false);
   const lastSavedRef = useRef(0);
@@ -109,9 +116,7 @@ const GlobalAudioPlayer = () => {
   const SLEEP_KEY = "ibadahmu:audio:sleep";
   const AUTOPLAY_KEY = "ibadahmu:audio:autoplay";
   const [showQueue, setShowQueue] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
+
   const resolvedSrc = typeof track?.src === "string" ? track.src : "";
   const prefetchSrc = useMemo(() => {
     if (!queue.length) return "";
@@ -135,31 +140,138 @@ const GlobalAudioPlayer = () => {
     return value;
   }, [track?.segment?.endTime, segmentStart]);
 
-  const resumeAudioContext = useCallback(() => {
-    const ctx = audioContextRef.current;
-    if (!ctx || ctx.state === "running") return;
-    ctx.resume().catch(() => undefined);
-  }, []);
+  const initAudioContext = useCallback(() => {
+    if (typeof window === "undefined") return null;
+    if (audioContextRef.current && sourceRef.current)
+      return audioContextRef.current;
+    const audio = audioRef.current;
+    if (!audio) return null;
+
+    try {
+      const AudioContextClass =
+        window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioContextClass();
+      audioContextRef.current = ctx;
+      const source = ctx.createMediaElementSource(audio);
+      sourceRef.current = source;
+      const bypassGain = ctx.createGain();
+      const eqGain = ctx.createGain();
+      const masterGain = ctx.createGain();
+      const analyser = ctx.createAnalyser();
+      const limiter = ctx.createDynamicsCompressor();
+      const limiterGain = ctx.createGain();
+      const limiterBypass = ctx.createGain();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.85;
+      const enabled = eqEnabledRef.current;
+      bypassGain.gain.value = enabled ? 0 : 1;
+      eqGain.gain.value = enabled ? 1 : 0;
+      masterGain.gain.value = dbToGain(preamp);
+      limiter.threshold.value = -3;
+      limiter.knee.value = 6;
+      limiter.ratio.value = 12;
+      limiter.attack.value = 0.003;
+      limiter.release.value = 0.1;
+      const limiterOn = limiterEnabledRef.current;
+      limiterGain.gain.value = limiterOn ? 1 : 0;
+      limiterBypass.gain.value = limiterOn ? 0 : 1;
+      const bands = eqBandsRef.current;
+      const filters = EQ_FREQUENCIES.map((freq, index) => {
+        const filter = ctx.createBiquadFilter();
+        filter.type = "peaking";
+        filter.frequency.value = freq;
+        filter.Q.value = 1;
+        filter.gain.value = bands[index] ?? 0;
+        return filter;
+      });
+      const panner = ctx.createStereoPanner();
+      pannerRef.current = panner;
+
+      source.connect(bypassGain);
+      if (filters.length > 0) {
+        source.connect(filters[0]);
+        for (let i = 0; i < filters.length - 1; i += 1) {
+          filters[i].connect(filters[i + 1]);
+        }
+        filters[filters.length - 1].connect(eqGain);
+      } else {
+        source.connect(eqGain);
+      }
+      eqGain.connect(masterGain);
+      bypassGain.connect(masterGain);
+      masterGain.connect(panner);
+      panner.connect(limiter);
+      limiter.connect(limiterGain);
+      masterGain.connect(limiterBypass);
+      limiterGain.connect(analyser);
+      limiterBypass.connect(analyser);
+      analyser.connect(ctx.destination);
+      eqFiltersRef.current = filters;
+      eqGainRef.current = eqGain;
+      bypassGainRef.current = bypassGain;
+      masterGainRef.current = masterGain;
+      analyserRef.current = analyser;
+      analyserDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+      timeDataRef.current = new Uint8Array(analyser.fftSize);
+      limiterRef.current = limiter;
+      limiterGainRef.current = limiterGain;
+      limiterBypassRef.current = limiterBypass;
+      return ctx;
+    } catch (err) {
+      console.error("AudioContext initialization failed:", err);
+      return null;
+    }
+  }, [preamp]);
+
+  const resumeAudioContext = useCallback(async () => {
+    let ctx = audioContextRef.current;
+    if (!ctx) {
+      ctx = initAudioContext();
+    }
+    if (!ctx) return;
+    if (ctx.state === "suspended") {
+      try {
+        await ctx.resume();
+      } catch (err) {
+        console.warn("Failed to resume AudioContext:", err);
+      }
+    }
+  }, [initAudioContext]);
 
   const playAudioSafely = useCallback(
     (audio: HTMLAudioElement, options?: { onBlocked?: () => void }) => {
-      resumeAudioContext();
-      const playPromise = audio.play();
-      if (!playPromise || typeof playPromise.catch !== "function") return;
-      playPromise
-        .then(() => setAutoplayBlocked(false))
-        .catch((err: unknown) => {
-          if (err instanceof DOMException && err.name === "AbortError") {
-            return;
-          }
-          options?.onBlocked?.();
-        });
+      const maybePromise = resumeAudioContext();
+      const play = () => {
+        const playPromise = audio.play();
+        if (!playPromise || typeof playPromise.catch !== "function") return;
+        playPromise
+          .then(() => setAutoplayBlocked(false))
+          .catch((err: unknown) => {
+            if (err instanceof DOMException && err.name === "AbortError") {
+              return;
+            }
+            console.warn("Audio playback blocked or failed:", err);
+            options?.onBlocked?.();
+          });
+      };
+      if (maybePromise instanceof Promise) {
+        maybePromise.then(play);
+      } else {
+        play();
+      }
     },
     [resumeAudioContext],
   );
 
+  useEffect(() => {
+    if (track) {
+      initAudioContext();
+    }
+  }, [track, initAudioContext]);
+
   const streamInfo = useMemo(() => {
-    if (!track || !resolvedSrc) return null;
+    if (!track || !resolvedSrc)
+      return { format: "Unknown", sourceLabel: "Unknown", quality: "Default" };
     const safeSrc = resolvedSrc;
     const formatSource = safeSrc.split("#")[0] ?? safeSrc;
     const format =
@@ -205,76 +317,6 @@ const GlobalAudioPlayer = () => {
   }, [limiterEnabled]);
 
   useEffect(() => {
-    if (!track) return;
-    if (typeof window === "undefined") return;
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (audioContextRef.current && sourceRef.current) return;
-    const ctx = new AudioContext();
-    audioContextRef.current = ctx;
-    const source = ctx.createMediaElementSource(audio);
-    sourceRef.current = source;
-    const bypassGain = ctx.createGain();
-    const eqGain = ctx.createGain();
-    const masterGain = ctx.createGain();
-    const analyser = ctx.createAnalyser();
-    const limiter = ctx.createDynamicsCompressor();
-    const limiterGain = ctx.createGain();
-    const limiterBypass = ctx.createGain();
-    analyser.fftSize = 512;
-    analyser.smoothingTimeConstant = 0.85;
-    const enabled = eqEnabledRef.current;
-    bypassGain.gain.value = enabled ? 0 : 1;
-    eqGain.gain.value = enabled ? 1 : 0;
-    masterGain.gain.value = dbToGain(preamp);
-    limiter.threshold.value = -3;
-    limiter.knee.value = 6;
-    limiter.ratio.value = 12;
-    limiter.attack.value = 0.003;
-    limiter.release.value = 0.1;
-    const limiterOn = limiterEnabledRef.current;
-    limiterGain.gain.value = limiterOn ? 1 : 0;
-    limiterBypass.gain.value = limiterOn ? 0 : 1;
-    const bands = eqBandsRef.current;
-    const filters = EQ_FREQUENCIES.map((freq, index) => {
-      const filter = ctx.createBiquadFilter();
-      filter.type = "peaking";
-      filter.frequency.value = freq;
-      filter.Q.value = 1;
-      filter.gain.value = bands[index] ?? 0;
-      return filter;
-    });
-    source.connect(bypassGain);
-    if (filters.length > 0) {
-      source.connect(filters[0]);
-      for (let i = 0; i < filters.length - 1; i += 1) {
-        filters[i].connect(filters[i + 1]);
-      }
-      filters[filters.length - 1].connect(eqGain);
-    } else {
-      source.connect(eqGain);
-    }
-    eqGain.connect(masterGain);
-    bypassGain.connect(masterGain);
-    masterGain.connect(limiter);
-    limiter.connect(limiterGain);
-    masterGain.connect(limiterBypass);
-    limiterGain.connect(analyser);
-    limiterBypass.connect(analyser);
-    analyser.connect(ctx.destination);
-    eqFiltersRef.current = filters;
-    eqGainRef.current = eqGain;
-    bypassGainRef.current = bypassGain;
-    masterGainRef.current = masterGain;
-    analyserRef.current = analyser;
-    analyserDataRef.current = new Uint8Array(analyser.frequencyBinCount);
-    timeDataRef.current = new Uint8Array(analyser.fftSize);
-    limiterRef.current = limiter;
-    limiterGainRef.current = limiterGain;
-    limiterBypassRef.current = limiterBypass;
-  }, [track, preamp]);
-
-  useEffect(() => {
     if (track) return;
     const ctx = audioContextRef.current;
     if (!ctx) return;
@@ -294,53 +336,25 @@ const GlobalAudioPlayer = () => {
   }, [track]);
 
   useEffect(() => {
-    if (!track) return;
-    if (typeof window === "undefined") return;
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (audioContextRef.current && sourceRef.current) return;
-    const ctx = new AudioContext();
-    audioContextRef.current = ctx;
-    const source = ctx.createMediaElementSource(audio);
-    sourceRef.current = source;
-    const bypassGain = ctx.createGain();
-    const eqGain = ctx.createGain();
-    const enabled = eqEnabledRef.current;
-    bypassGain.gain.value = enabled ? 0 : 1;
-    eqGain.gain.value = enabled ? 1 : 0;
-    const bands = eqBandsRef.current;
-    const filters = EQ_FREQUENCIES.map((freq, index) => {
-      const filter = ctx.createBiquadFilter();
-      filter.type = "peaking";
-      filter.frequency.value = freq;
-      filter.Q.value = 1;
-      filter.gain.value = bands[index] ?? 0;
-      return filter;
-    });
-    source.connect(bypassGain);
-    bypassGain.connect(ctx.destination);
-    if (filters.length > 0) {
-      source.connect(filters[0]);
-      for (let i = 0; i < filters.length - 1; i += 1) {
-        filters[i].connect(filters[i + 1]);
-      }
-      filters[filters.length - 1].connect(eqGain);
-    } else {
-      source.connect(eqGain);
-    }
-    eqGain.connect(ctx.destination);
-    eqFiltersRef.current = filters;
-    eqGainRef.current = eqGain;
-    bypassGainRef.current = bypassGain;
     return () => {
-      ctx.close().catch(() => undefined);
+      const ctx = audioContextRef.current;
+      if (ctx) {
+        ctx.close().catch(() => undefined);
+      }
       audioContextRef.current = null;
       sourceRef.current = null;
       eqFiltersRef.current = [];
       eqGainRef.current = null;
       bypassGainRef.current = null;
+      masterGainRef.current = null;
+      analyserRef.current = null;
+      analyserDataRef.current = null;
+      timeDataRef.current = null;
+      limiterRef.current = null;
+      limiterGainRef.current = null;
+      limiterBypassRef.current = null;
     };
-  }, [track]);
+  }, []);
 
   useEffect(() => {
     const eqGain = eqGainRef.current;
@@ -743,11 +757,18 @@ const GlobalAudioPlayer = () => {
     setSleepEndsAt(endsAt);
     timerRef.current = window.setTimeout(
       () => {
+        timerRef.current = null;
         setTrack(null);
         setSleepMinutes(0);
       },
       sleepMinutes * 60 * 1000,
     );
+    return () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [sleepMinutes, setTrack]);
 
   const sleepLabel = sleepEndsAt
@@ -773,8 +794,6 @@ const GlobalAudioPlayer = () => {
       // ignore
     }
   }, [sleepMinutes]);
-
-  if (!track || !streamInfo) return null;
 
   const handlePrevClick = () => {
     const audio = audioRef.current;
@@ -861,44 +880,20 @@ const GlobalAudioPlayer = () => {
     setEqPreset("Custom");
   };
 
-  const handleQueueClick = () => {
-    setShowQueue((prevValue) => !prevValue);
-  };
-
-  const handleHistoryClick = () => {
-    setShowHistory((prevValue) => !prevValue);
+  const handleCyclePreset = () => {
+    const presets = Object.keys(EQ_PRESETS) as Array<keyof typeof EQ_PRESETS>;
+    const currentIndex =
+      eqPreset === "Custom"
+        ? -1
+        : presets.indexOf(eqPreset as keyof typeof EQ_PRESETS);
+    const nextIndex = (currentIndex + 1) % presets.length;
+    applyPreset(presets[nextIndex]);
   };
 
   const handleJump = (index: number) => {
     jumpTo(index);
     setShowQueue(false);
   };
-
-  const handlePlayHistory = (itemIndex: number) => {
-    const item = history[itemIndex];
-    if (!item) return;
-    setQueueByTrack(item);
-    setShowHistory(false);
-  };
-
-  const resumeLabel =
-    resumeTime && resumeTime > 5 ? formatTime(resumeTime) : null;
-
-  const moduleLabels: Record<string, string> = {
-    murratal: "Murratal",
-    "murratal-juz": "Murratal Juz",
-    quran: "Quran",
-    doa: "Doa",
-    matsurat: "Matsurat",
-  };
-
-  const moduleEntries = Object.entries(lastByModule ?? {})
-    .filter(([, item]) => Boolean(item?.src))
-    .map(([key, item]) => ({
-      key,
-      label: moduleLabels[key] ?? key,
-      item,
-    }));
 
   const handleRepeatToggle = () => {
     if (repeatMode === "off") {
@@ -911,428 +906,377 @@ const GlobalAudioPlayer = () => {
   };
 
   return (
-    <div className="safe-bottom fixed bottom-20 left-0 right-0 z-40 mx-auto w-full max-w-4xl px-4 lg:bottom-6">
-      <div className="winamp-shell">
-        <div className="winamp-titlebar">
-          <span className="winamp-logo">WINAMP</span>
-          <span className="winamp-title">MURRATAL PLAYER</span>
+    <div className="relative w-full">
+      <audio
+        ref={audioRef}
+        className="sr-only"
+        preload="auto"
+        src={resolvedSrc}
+        crossOrigin="anonymous"
+        onPlay={() => {
+          resumeAudioContext();
+          setAutoplayBlocked(false);
+        }}
+        onEnded={() => {
+          clearPosition();
+          segmentHandledRef.current = true;
+          if (repeatMode === "one") {
+            const audio = audioRef.current;
+            if (audio) {
+              audio.currentTime = segmentStart;
+              playAudioSafely(audio);
+            }
+            return;
+          }
+          if (repeatMode === "all") {
+            next({ wrap: true });
+            return;
+          }
+          next({ wrap: false });
+        }}
+        onError={(e) => {
+          const target = e.target as HTMLAudioElement;
+          console.error("Audio element error:", target.error);
+        }}
+      />
+
+      {track && streamInfo ? (
+        <div
+          className={`winamp95-stage ${embedded ? "winamp95-stage-embedded" : ""}`}
+        >
+          <div className="winamp95-column">
+            <div className="winamp-shell winamp95-main">
+              <div className="winamp-titlebar winamp95-titlebar">
+                <span className="winamp95-title-rail" />
+                <span className="winamp95-title-text">WINAMP</span>
+                <span className="winamp95-title-rail" />
+                <div className="winamp95-window-controls">
+                  <button
+                    type="button"
+                    onClick={() => setTrack(null)}
+                    className="winamp95-window-btn"
+                    aria-label="Tutup player"
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
+                  <span className="winamp95-window-dot" />
+                  <span className="winamp95-window-dot" />
+                </div>
+              </div>
+
+              <div className="winamp95-main-body">
+                <div className="winamp95-upper-strip">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div className="winamp95-display">
+                  <div className="winamp95-display-left">
+                    <div className="winamp95-led-row">
+                      <span className={isPlaying ? "is-active" : ""}>▶</span>
+                      <span className={!isPlaying ? "is-active" : ""}>■</span>
+                    </div>
+                    <div className="winamp95-time">{formatTime(progress)}</div>
+                    <div className="winamp95-analyser">
+                      {Array.from({ length: 14 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={isPlaying ? "is-playing" : ""}
+                          style={{ animationDelay: `${i * 0.05}s` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="winamp95-display-right">
+                    <div className="winamp95-trackline">1. {track.title}</div>
+                    {track.subtitle ? (
+                      <div className="winamp95-subtrack">{track.subtitle}</div>
+                    ) : null}
+                    <div className="winamp95-meta-row">
+                      <span>
+                        {streamInfo.quality === "High" ? "128" : "64"} kbps
+                      </span>
+                      <span>44 kHz</span>
+                      <span>{streamInfo.format}</span>
+                      <span className="is-source">
+                        {streamInfo.sourceLabel}
+                      </span>
+                    </div>
+                    <div className="winamp95-mode-row">
+                      <span className="is-off">mono</span>
+                      <span className="is-on">stereo</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={duration || 0}
+                      step={1}
+                      value={duration ? progress : 0}
+                      onChange={(e) => handleSeek(Number(e.target.value))}
+                      className="winamp95-seek"
+                      disabled={!duration}
+                    />
+                    <div className="winamp95-time-row">
+                      <span>{formatTime(progress)}</span>
+                      <span>{formatTime(duration)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="winamp95-control-row">
+                  <div className="winamp95-transport">
+                    <button
+                      onClick={handlePrevClick}
+                      title="Previous"
+                      className="winamp-btn winamp95-btn"
+                    >
+                      <SkipBack className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={handlePlayPause}
+                      title={isPlaying ? "Pause" : "Play"}
+                      className="winamp-btn winamp95-btn"
+                    >
+                      {isPlaying ? (
+                        <Pause className="h-3.5 w-3.5 fill-current" />
+                      ) : (
+                        <Play className="h-3.5 w-3.5 fill-current" />
+                      )}
+                    </button>
+                    <button
+                      onClick={handleStop}
+                      title="Stop"
+                      className="winamp-btn winamp95-btn"
+                    >
+                      <Square className="h-3 w-3 fill-current" />
+                    </button>
+                    <button
+                      onClick={handleNextClick}
+                      title="Next"
+                      className="winamp-btn winamp95-btn"
+                    >
+                      <SkipForward className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Eject"
+                      className="winamp-btn winamp95-btn winamp95-eject"
+                    >
+                      ▲
+                    </button>
+                  </div>
+                  <div className="winamp95-toggle-row">
+                    <button
+                      type="button"
+                      onClick={() => setShowEq(!showEq)}
+                      className={`winamp-toggle winamp95-toggle ${showEq ? "is-on" : ""}`}
+                    >
+                      EQ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowQueue(!showQueue)}
+                      className={`winamp-toggle winamp95-toggle ${showQueue ? "is-on" : ""}`}
+                    >
+                      PL
+                    </button>
+                    <button
+                      onClick={toggleShuffle}
+                      className={`winamp-toggle winamp95-toggle ${isShuffle ? "is-on" : ""}`}
+                    >
+                      SHF
+                    </button>
+                    <button
+                      onClick={handleRepeatToggle}
+                      className={`winamp-toggle winamp95-toggle ${repeatMode !== "off" ? "is-on" : ""}`}
+                    >
+                      {repeatMode === "one" ? "R1" : "REP"}
+                    </button>
+                  </div>
+                  <div className="winamp95-power">
+                    <Zap className="h-3 w-3" />
+                  </div>
+                </div>
+
+                <div className="winamp95-mix-row">
+                  <label className="winamp95-mix-control">
+                    <span>VOL</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={volume}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setVolume(val);
+                        if (masterGainRef.current) {
+                          masterGainRef.current.gain.value =
+                            (val / 100) * dbToGain(preamp);
+                        }
+                      }}
+                      className="winamp-vol-slider"
+                    />
+                  </label>
+                  <label className="winamp95-mix-control">
+                    <span>BAL</span>
+                    <input
+                      type="range"
+                      min="-100"
+                      max="100"
+                      value={balance}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setBalance(val);
+                        if (pannerRef.current) {
+                          pannerRef.current.pan.value = val / 100;
+                        }
+                      }}
+                      className="winamp-bal-slider"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {showEq && (
+              <div className="winamp-shell winamp95-eq">
+                <div className="winamp-titlebar winamp95-titlebar">
+                  <span className="winamp95-title-rail" />
+                  <span className="winamp95-title-text">WINAMP EQUALIZER</span>
+                  <span className="winamp95-title-rail" />
+                  <span className="winamp95-title-spacer" />
+                </div>
+                <div className="winamp95-eq-body">
+                  <div className="winamp95-eq-top">
+                    <div className="winamp95-eq-switches">
+                      <button
+                        type="button"
+                        onClick={() => setEqEnabled((prev) => !prev)}
+                        className={`winamp-toggle winamp95-toggle ${eqEnabled ? "is-on" : ""}`}
+                      >
+                        ON
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEqAuto((prev) => !prev)}
+                        className={`winamp-toggle winamp95-toggle ${eqAuto ? "is-on" : ""}`}
+                      >
+                        AUTO
+                      </button>
+                    </div>
+                    <div className="winamp95-eq-presets">
+                      <button
+                        type="button"
+                        onClick={handleCyclePreset}
+                        className="winamp-toggle winamp95-toggle winamp95-presets-btn"
+                      >
+                        PRESETS
+                      </button>
+                      <span className="winamp95-preset-label">{eqPreset}</span>
+                    </div>
+                  </div>
+
+                  <div className="winamp95-eq-sliders-wrap">
+                    <div className="winamp95-eq-db-scale">
+                      <span>+12</span>
+                      <span>0</span>
+                      <span>-12</span>
+                    </div>
+                    <div className="winamp95-eq-sliders">
+                      <div className="winamp95-eq-band">
+                        <div className="winamp95-eq-rail">
+                          <input
+                            type="range"
+                            min="-20"
+                            max="20"
+                            step="0.5"
+                            value={preamp}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              setPreamp(val);
+                              if (masterGainRef.current) {
+                                masterGainRef.current.gain.value =
+                                  (volume / 100) * dbToGain(val);
+                              }
+                            }}
+                            className="winamp-eq-slider-classic"
+                          />
+                        </div>
+                        <span>PRE</span>
+                      </div>
+
+                      {eqBands.map((val, idx) => (
+                        <div key={idx} className="winamp95-eq-band">
+                          <div className="winamp95-eq-rail">
+                            <input
+                              type="range"
+                              min="-12"
+                              max="12"
+                              step="0.5"
+                              value={val}
+                              disabled={!eqEnabled}
+                              onChange={(e) =>
+                                handleBandChange(
+                                  idx,
+                                  parseFloat(e.target.value),
+                                )
+                              }
+                              className="winamp-eq-slider-classic"
+                            />
+                          </div>
+                          <span>{EQ_LABELS[idx]}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {showQueue && (
+            <div className="winamp-shell winamp95-playlist">
+              <div className="winamp-titlebar winamp95-titlebar">
+                <span className="winamp95-title-rail" />
+                <span className="winamp95-title-text">WINAMP PLAYLIST</span>
+                <span className="winamp95-title-rail" />
+                <span className="winamp95-title-spacer" />
+              </div>
+              <div className="winamp95-playlist-body">
+                {queue.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleJump(idx)}
+                    className={`winamp95-playlist-item ${idx === currentIndex ? "is-active" : ""}`}
+                  >
+                    <span>{idx + 1}.</span> {item.title}
+                  </button>
+                ))}
+              </div>
+              <div className="winamp95-playlist-footer">
+                <button className="winamp-toggle winamp95-toggle">ADD</button>
+                <button className="winamp-toggle winamp95-toggle">REM</button>
+                <button className="winamp-toggle winamp95-toggle">SEL</button>
+                <div className="winamp95-playlist-time">
+                  {formatTime(progress)} / {formatTime(duration)}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {autoplayBlocked && track ? (
+        <div className="px-3 pb-2">
           <button
-            type="button"
-            onClick={() => setTrack(null)}
-            className="winamp-close"
-            aria-label="Tutup audio"
+            onClick={handlePlayPause}
+            className="mx-auto block bg-emerald-600 px-6 py-1 text-[10px] font-bold text-white shadow-lg animate-pulse"
           >
-            <X className="h-3.5 w-3.5" />
+            AUTOPLAY BLOCKED - CLICK TO PLAY
           </button>
         </div>
-
-        <audio
-          ref={audioRef}
-          className="sr-only"
-          preload="auto"
-          src={resolvedSrc}
-          crossOrigin="anonymous"
-          onPlay={() => {
-            resumeAudioContext();
-            setAutoplayBlocked(false);
-          }}
-          onEnded={() => {
-            clearPosition();
-            segmentHandledRef.current = true;
-            if (repeatMode === "one") {
-              const audio = audioRef.current;
-              if (audio) {
-                audio.currentTime = segmentStart;
-                playAudioSafely(audio);
-              }
-              return;
-            }
-            if (repeatMode === "all") {
-              next({ wrap: true });
-              return;
-            }
-            next({ wrap: false });
-          }}
-        />
-
-        <div className="winamp-body">
-          <div className="winamp-display">
-            <div className="winamp-track">{track.title}</div>
-            {track.subtitle ? (
-              <div className="winamp-subtitle">{track.subtitle}</div>
-            ) : (
-              <div className="winamp-subtitle">—</div>
-            )}
-            <div className="winamp-meta">
-              {track.module ? (
-                <span>{moduleLabels[track.module] ?? track.module}</span>
-              ) : null}
-              {queue.length > 1 ? (
-                <span>
-                  Track {currentIndex + 1}/{queue.length}
-                </span>
-              ) : null}
-              <span>{streamInfo.format}</span>
-              <span>{streamInfo.quality}</span>
-            </div>
-          </div>
-          <div className="winamp-vu">
-            <div className="winamp-vu-bars">
-              {Array.from({ length: 12 }, (_, index) => (
-                <span
-                  key={`meter-${index}`}
-                  className={`winamp-vu-bar ${isPlaying ? "is-playing" : ""}`}
-                  style={{ animationDelay: `${index * 0.08}s` }}
-                />
-              ))}
-            </div>
-            <div className="winamp-vu-labels">
-              <span>{streamInfo.sourceLabel}</span>
-              <span>{autoplayBlocked ? "Autoplay Off" : "Stereo"}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="winamp-progress">
-          <input
-            type="range"
-            min={0}
-            max={duration || 0}
-            step={1}
-            value={duration ? progress : 0}
-            onChange={(event) => handleSeek(Number(event.target.value))}
-            className="winamp-slider"
-            aria-label="Posisi audio"
-            disabled={!duration}
-          />
-          <div className="winamp-time">
-            <span>{formatTime(progress)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </div>
-
-        <div className="winamp-transport">
-          <div className="winamp-buttons">
-            <button
-              type="button"
-              onClick={handlePrevClick}
-              className="winamp-btn"
-              aria-label="Track sebelumnya"
-            >
-              <SkipBack className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handlePlayPause}
-              className="winamp-btn winamp-btn--primary"
-              aria-label={isPlaying ? "Jeda" : "Putar"}
-            >
-              {isPlaying ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={handleStop}
-              className="winamp-btn"
-              aria-label="Stop"
-            >
-              <Square className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNextClick}
-              className="winamp-btn"
-              aria-label="Track berikutnya"
-            >
-              <SkipForward className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="winamp-toggles">
-            <button
-              type="button"
-              onClick={toggleShuffle}
-              className={`winamp-toggle ${isShuffle ? "is-on" : ""}`}
-              aria-pressed={isShuffle}
-            >
-              SHUF
-            </button>
-            <button
-              type="button"
-              onClick={handleRepeatToggle}
-              className={`winamp-toggle ${repeatMode !== "off" ? "is-on" : ""}`}
-              aria-pressed={repeatMode !== "off"}
-            >
-              {repeatMode === "one"
-                ? "REP1"
-                : repeatMode === "all"
-                  ? "REPA"
-                  : "REPO"}
-            </button>
-            <button
-              type="button"
-              onClick={handleQueueClick}
-              className={`winamp-toggle ${showQueue ? "is-on" : ""}`}
-              aria-pressed={showQueue}
-            >
-              PL
-            </button>
-            <button
-              type="button"
-              onClick={handleHistoryClick}
-              className={`winamp-toggle ${showHistory ? "is-on" : ""}`}
-              aria-pressed={showHistory}
-            >
-              HIS
-            </button>
-            <button
-              type="button"
-              onClick={() => setAutoplayLast((prev) => !prev)}
-              className={`winamp-toggle ${autoplayLast ? "is-on" : ""}`}
-              aria-pressed={autoplayLast}
-            >
-              AUTO
-            </button>
-          </div>
-        </div>
-
-        <div className="winamp-footer">
-          <div className="winamp-options">
-            <label className="winamp-select">
-              SPD
-              <select
-                value={playbackRate}
-                onChange={(event) =>
-                  setPlaybackRate(Number(event.target.value))
-                }
-              >
-                <option value={0.75}>0.75x</option>
-                <option value={1}>1.0x</option>
-                <option value={1.25}>1.25x</option>
-                <option value={1.5}>1.5x</option>
-              </select>
-            </label>
-            <label className="winamp-select">
-              SLP
-              <select
-                value={sleepMinutes}
-                onChange={(event) =>
-                  setSleepMinutes(Number(event.target.value))
-                }
-              >
-                <option value={0}>Off</option>
-                <option value={5}>5m</option>
-                <option value={10}>10m</option>
-                <option value={15}>15m</option>
-                <option value={30}>30m</option>
-              </select>
-            </label>
-            {sleepLabel ? (
-              <span className="winamp-status">Sleep {sleepLabel}</span>
-            ) : null}
-            {resumeLabel ? (
-              <span className="winamp-status">Resume {resumeLabel}</span>
-            ) : null}
-            {prevActionLabel ? (
-              <span className="winamp-status">{prevActionLabel}</span>
-            ) : null}
-            {autoplayBlocked ? (
-              <span className="winamp-status">Autoplay diblokir</span>
-            ) : null}
-          </div>
-          <a
-            href={resolvedSrc}
-            target="_blank"
-            rel="noreferrer"
-            className="winamp-btn winamp-btn--link"
-          >
-            <Download className="h-4 w-4" />
-            DL
-          </a>
-        </div>
-
-        <div className="winamp-eq">
-          <div className="winamp-eq-header">
-            <div className="winamp-eq-controls">
-              <button
-                type="button"
-                onClick={() => setEqEnabled((prev) => !prev)}
-                className={`winamp-toggle ${eqEnabled ? "is-on" : ""}`}
-                aria-pressed={eqEnabled}
-              >
-                EQ
-              </button>
-              <button
-                type="button"
-                onClick={() => setEqAuto((prev) => !prev)}
-                className={`winamp-toggle ${eqAuto ? "is-on" : ""}`}
-                aria-pressed={eqAuto}
-              >
-                AUTO
-              </button>
-              <button
-                type="button"
-                onClick={() => setLimiterEnabled((prev) => !prev)}
-                className={`winamp-toggle ${limiterEnabled ? "is-on" : ""}`}
-                aria-pressed={limiterEnabled}
-              >
-                LIM
-              </button>
-              <button
-                type="button"
-                onClick={() => applyPreset("Flat")}
-                className="winamp-toggle"
-              >
-                RESET
-              </button>
-            </div>
-            <div className="winamp-eq-presets">
-              {Object.keys(EQ_PRESETS).map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => applyPreset(preset as keyof typeof EQ_PRESETS)}
-                  className={`winamp-chip ${
-                    eqPreset === preset ? "is-active" : ""
-                  }`}
-                >
-                  {preset}
-                </button>
-              ))}
-              {eqPreset === "Custom" ? (
-                <span className="winamp-eq-custom">Custom</span>
-              ) : null}
-            </div>
-          </div>
-          <div className={`winamp-eq-bands ${eqEnabled ? "" : "is-disabled"}`}>
-            <label className="winamp-eq-band winamp-eq-preamp">
-              <input
-                type="range"
-                min={-12}
-                max={12}
-                step={1}
-                value={preamp}
-                onChange={(event) => setPreamp(Number(event.target.value))}
-                aria-label="Preamp"
-              />
-              <span>PRE</span>
-            </label>
-            {EQ_LABELS.map((label, index) => (
-              <label key={label} className="winamp-eq-band">
-                <input
-                  type="range"
-                  min={-12}
-                  max={12}
-                  step={1}
-                  value={eqBands[index] ?? 0}
-                  onChange={(event) =>
-                    handleBandChange(index, Number(event.target.value))
-                  }
-                  disabled={!eqEnabled}
-                  aria-label={`EQ ${label}`}
-                />
-                <span>{label}</span>
-              </label>
-            ))}
-          </div>
-          <div className="winamp-spectrum-wrap">
-            <canvas
-              ref={spectrumCanvasRef}
-              className="winamp-spectrum"
-              aria-hidden="true"
-            />
-            <div className="winamp-meters">
-              <div className="winamp-meter">
-                <span ref={rmsBarRef} />
-                <label>RMS</label>
-              </div>
-              <div className="winamp-meter">
-                <span ref={peakBarRef} />
-                <label>PEAK</label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {moduleEntries.length > 0 ? (
-          <div className="winamp-jump">
-            {moduleEntries.map(({ key, label, item }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setQueueByTrack(item)}
-                className="winamp-chip"
-              >
-                Lanjut {label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-
-        {showQueue ? (
-          <div className="winamp-panel">
-            <p className="winamp-panel-title">Antrian Saat Ini</p>
-            <div className="winamp-panel-list">
-              {queue.length === 0 ? (
-                <p className="winamp-panel-empty">Antrian kosong.</p>
-              ) : (
-                queue.map((item, index) => (
-                  <button
-                    key={`${item.src}-${index}`}
-                    type="button"
-                    onClick={() => handleJump(index)}
-                    className={`winamp-panel-item ${
-                      index === currentIndex ? "is-active" : ""
-                    }`}
-                  >
-                    <p className="winamp-panel-main">{item.title}</p>
-                    {item.module ? (
-                      <p className="winamp-panel-meta">
-                        {moduleLabels[item.module] ?? item.module}
-                      </p>
-                    ) : null}
-                    {item.subtitle ? (
-                      <p className="winamp-panel-sub">{item.subtitle}</p>
-                    ) : null}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        ) : null}
-
-        {showHistory ? (
-          <div className="winamp-panel">
-            <p className="winamp-panel-title">Terakhir Diputar</p>
-            <div className="winamp-panel-list">
-              {history.length === 0 ? (
-                <p className="winamp-panel-empty">Belum ada riwayat.</p>
-              ) : (
-                history.map((item, index) => (
-                  <button
-                    key={`${item.src}-${index}`}
-                    type="button"
-                    onClick={() => handlePlayHistory(index)}
-                    className="winamp-panel-item"
-                  >
-                    <p className="winamp-panel-main">{item.title}</p>
-                    {item.module ? (
-                      <p className="winamp-panel-meta">
-                        {moduleLabels[item.module] ?? item.module}
-                      </p>
-                    ) : null}
-                    {item.subtitle ? (
-                      <p className="winamp-panel-sub">{item.subtitle}</p>
-                    ) : null}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        ) : null}
-      </div>
+      ) : null}
     </div>
   );
 };

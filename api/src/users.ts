@@ -4,30 +4,31 @@ import { db } from "./db";
 const users = new Hono();
 
 const selectUserById = db.prepare(
-  "SELECT id, name, email, created_at, updated_at FROM users WHERE id = ?"
+  "SELECT id, name, email, created_at, updated_at FROM users WHERE id = ?",
 );
 const selectUserByEmail = db.prepare("SELECT id FROM users WHERE email = ?");
 const insertUser = db.prepare("INSERT INTO users (name, email) VALUES (?, ?)");
 const updateUser = db.prepare(
-  "UPDATE users SET name = ?, email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  "UPDATE users SET name = ?, email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
 );
 const updateUserPartial = db.prepare(
-  "UPDATE users SET name = COALESCE(?, name), email = COALESCE(?, email), updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  "UPDATE users SET name = COALESCE(?, name), email = COALESCE(?, email), updated_at = CURRENT_TIMESTAMP WHERE id = ?",
 );
 const deleteUser = db.prepare("DELETE FROM users WHERE id = ?");
 
 const listAll = db.prepare(
-  "SELECT id, name, email, created_at, updated_at FROM users ORDER BY id LIMIT ? OFFSET ?"
+  "SELECT id, name, email, created_at, updated_at FROM users ORDER BY id LIMIT ? OFFSET ?",
 );
 const countAll = db.prepare("SELECT COUNT(*) AS total FROM users");
 const listSearch = db.prepare(
-  "SELECT id, name, email, created_at, updated_at FROM users WHERE name LIKE ? OR email LIKE ? ORDER BY id LIMIT ? OFFSET ?"
+  "SELECT id, name, email, created_at, updated_at FROM users WHERE name LIKE ? OR email LIKE ? ORDER BY id LIMIT ? OFFSET ?",
 );
 const countSearch = db.prepare(
-  "SELECT COUNT(*) AS total FROM users WHERE name LIKE ? OR email LIKE ?"
+  "SELECT COUNT(*) AS total FROM users WHERE name LIKE ? OR email LIKE ?",
 );
 
 const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const MAX_SEARCH_LENGTH = 100;
 
 const parseId = (value?: string) => {
   const id = Number.parseInt(value ?? "", 10);
@@ -50,19 +51,37 @@ const normalizeEmail = (value: unknown) => {
   return email;
 };
 
+const isUniqueEmailError = (err: unknown) =>
+  err instanceof Error &&
+  /unique constraint failed:\s*users\.email/i.test(err.message);
+
 users.get("/", (c) => {
   const pageRaw = c.req.query("page");
   const limitRaw = c.req.query("limit");
   const q = c.req.query("q")?.trim();
 
   const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
-  const limit = Math.min(100, Math.max(1, Number.parseInt(limitRaw ?? "20", 10) || 20));
+  const limit = Math.min(
+    100,
+    Math.max(1, Number.parseInt(limitRaw ?? "20", 10) || 20),
+  );
   const offset = (page - 1) * limit;
+  if (q && q.length > MAX_SEARCH_LENGTH) {
+    return c.json(
+      {
+        status: false,
+        message: `Pencarian maksimal ${MAX_SEARCH_LENGTH} karakter.`,
+      },
+      400,
+    );
+  }
 
   if (q) {
     const search = `%${q}%`;
     const data = listSearch.all(search, search, limit, offset);
-    const totalRow = countSearch.get(search, search) as { total: number } | undefined;
+    const totalRow = countSearch.get(search, search) as
+      | { total: number }
+      | undefined;
     const total = totalRow?.total ?? 0;
     return c.json({
       status: true,
@@ -110,8 +129,11 @@ users.post("/", async (c) => {
 
   if (!name || !email) {
     return c.json(
-      { status: false, message: "Nama dan email wajib diisi dengan format yang benar." },
-      400
+      {
+        status: false,
+        message: "Nama dan email wajib diisi dengan format yang benar.",
+      },
+      400,
     );
   }
 
@@ -120,7 +142,15 @@ users.post("/", async (c) => {
     return c.json({ status: false, message: "Email sudah terdaftar." }, 409);
   }
 
-  const result = insertUser.run(name, email);
+  let result: ReturnType<typeof insertUser.run>;
+  try {
+    result = insertUser.run(name, email);
+  } catch (err) {
+    if (isUniqueEmailError(err)) {
+      return c.json({ status: false, message: "Email sudah terdaftar." }, 409);
+    }
+    throw err;
+  }
   const id = Number(result.lastInsertRowid);
   const user = selectUserById.get(id);
 
@@ -150,17 +180,33 @@ users.put("/:id", async (c) => {
 
   if (!name || !email) {
     return c.json(
-      { status: false, message: "Nama dan email wajib diisi dengan format yang benar." },
-      400
+      {
+        status: false,
+        message: "Nama dan email wajib diisi dengan format yang benar.",
+      },
+      400,
     );
   }
 
   const existing = selectUserByEmail.get(email) as { id: number } | undefined;
   if (existing && existing.id !== id) {
-    return c.json({ status: false, message: "Email sudah dipakai pengguna lain." }, 409);
+    return c.json(
+      { status: false, message: "Email sudah dipakai pengguna lain." },
+      409,
+    );
   }
 
-  updateUser.run(name, email, id);
+  try {
+    updateUser.run(name, email, id);
+  } catch (err) {
+    if (isUniqueEmailError(err)) {
+      return c.json(
+        { status: false, message: "Email sudah dipakai pengguna lain." },
+        409,
+      );
+    }
+    throw err;
+  }
   const user = selectUserById.get(id);
 
   return c.json({ status: true, message: "success", data: user });
@@ -188,7 +234,10 @@ users.patch("/:id", async (c) => {
   const hasEmail = Object.prototype.hasOwnProperty.call(body, "email");
 
   if (!hasName && !hasEmail) {
-    return c.json({ status: false, message: "Tidak ada data yang diperbarui." }, 400);
+    return c.json(
+      { status: false, message: "Tidak ada data yang diperbarui." },
+      400,
+    );
   }
 
   const name = hasName ? normalizeName(body.name) : null;
@@ -197,7 +246,7 @@ users.patch("/:id", async (c) => {
   if ((hasName && !name) || (hasEmail && !email)) {
     return c.json(
       { status: false, message: "Nama atau email tidak valid." },
-      400
+      400,
     );
   }
 
@@ -206,12 +255,22 @@ users.patch("/:id", async (c) => {
     if (existing && existing.id !== id) {
       return c.json(
         { status: false, message: "Email sudah dipakai pengguna lain." },
-        409
+        409,
       );
     }
   }
 
-  updateUserPartial.run(name, email, id);
+  try {
+    updateUserPartial.run(name, email, id);
+  } catch (err) {
+    if (isUniqueEmailError(err)) {
+      return c.json(
+        { status: false, message: "Email sudah dipakai pengguna lain." },
+        409,
+      );
+    }
+    throw err;
+  }
   const user = selectUserById.get(id);
 
   return c.json({ status: true, message: "success", data: user });

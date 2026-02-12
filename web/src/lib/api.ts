@@ -2,6 +2,21 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 const DIRECT_MYQURAN_BASE = "https://api.myquran.com/v3";
 const DIRECT_DOA_BASE = "https://equran.id/api/doa";
 const DOA_TTL = 60 * 60 * 1000;
+const toPositiveInt = (value: unknown, fallback: number) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  const normalized = Math.floor(parsed);
+  return normalized > 0 ? normalized : fallback;
+};
+const API_TIMEOUT_MS = toPositiveInt(
+  import.meta.env.VITE_API_TIMEOUT_MS,
+  12000,
+);
+const API_MAX_ATTEMPTS = toPositiveInt(
+  import.meta.env.VITE_API_MAX_ATTEMPTS,
+  2,
+);
+const MAX_DOA_KEYWORD_LENGTH = 100;
 
 export type ApiResult<T> = {
   status: boolean;
@@ -14,7 +29,13 @@ export type ApiResult<T> = {
   };
 };
 
-type ApiErrorCode = "network" | "http" | "non-json" | "parse";
+type ApiErrorCode =
+  | "network"
+  | "timeout"
+  | "aborted"
+  | "http"
+  | "non-json"
+  | "parse";
 type ApiStatus = "unknown" | "ok" | "fallback";
 type ApiSource = "unknown" | "proxy" | "myquran" | "equran";
 
@@ -108,7 +129,34 @@ const buildUrl = (path: string, baseOverride?: string) => {
   return `${base}${cleaned}`;
 };
 
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    globalThis.setTimeout(resolve, ms);
+  });
+
+const isRetryableApiError = (error: ApiError) => {
+  if (
+    error.code === "network" ||
+    error.code === "timeout" ||
+    error.code === "non-json"
+  ) {
+    return true;
+  }
+  if (error.code === "parse") return true;
+  if (error.code === "http") {
+    return (
+      error.status === 408 ||
+      error.status === 429 ||
+      (error.status >= 500 && error.status <= 599)
+    );
+  }
+  return false;
+};
+
 const isDoaPath = (path: string) => path.startsWith("/doa/harian");
+const myQuranFallbackPrefixes = ["/sholat", "/hadis", "/cal"];
+const canFallbackToMyQuran = (path: string) =>
+  myQuranFallbackPrefixes.some((prefix) => path.startsWith(prefix));
 const resolveSourceForBase = (base: string): ApiSource => {
   if (base === "/api") return "proxy";
   if (base.includes("api.myquran.com")) return "myquran";
@@ -208,8 +256,15 @@ const fetchDoaDetailDirect = async (id: string) => {
   const response = await fetch(`${DIRECT_DOA_BASE}/${id}`, {
     headers: { Accept: "application/json" },
   });
-  if (!response.ok) {
+  if (response.status === 404) {
     return null;
+  }
+  if (!response.ok) {
+    throw new ApiError(
+      `Gagal mengambil detail doa. (${response.status})`,
+      response.status,
+      "http",
+    );
   }
   const payload = (await response.json()) as { data?: DoaItem };
   return payload?.data ?? null;
@@ -282,6 +337,13 @@ const handleDoaFallback = async <T>(
     if (!keyword) {
       throw new ApiError("Keyword wajib diisi.", 400, "http");
     }
+    if (keyword.length > MAX_DOA_KEYWORD_LENGTH) {
+      throw new ApiError(
+        `Keyword maksimal ${MAX_DOA_KEYWORD_LENGTH} karakter.`,
+        400,
+        "http",
+      );
+    }
     const filtered = list.filter((item) => {
       const haystack = [item.nama, item.idn, item.grup, item.tentang, item.tr]
         .filter(Boolean)
@@ -317,56 +379,120 @@ const fetchJsonWithBase = async <T>(
   baseOverride?: string,
   init?: RequestInit,
 ): Promise<ApiResult<T>> => {
-  let response: Response;
-  try {
-    response = await fetch(buildUrl(path, baseOverride), {
-      ...init,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        ...(init?.headers ?? {}),
-      },
-    });
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : "Network error";
-    throw new ApiError(
-      `Tidak dapat terhubung ke server API. ${detail}`,
-      0,
-      "network",
-    );
-  }
-
-  const contentType = response.headers.get("content-type") ?? "";
-  const raw = await response.text();
-
-  if (!response.ok) {
-    let message = `HTTP ${response.status}`;
-    try {
-      const payload = JSON.parse(raw) as { message?: string };
-      if (payload?.message) message = payload.message;
-    } catch {
-      // ignore
+  for (let attempt = 1; attempt <= API_MAX_ATTEMPTS; attempt += 1) {
+    const hasAbortController = typeof AbortController !== "undefined";
+    const controller = hasAbortController ? new AbortController() : null;
+    const externalSignal = init?.signal;
+    const abortFromExternal = () => {
+      if (!controller) return;
+      controller.abort();
+    };
+    if (externalSignal && controller) {
+      if (externalSignal.aborted) {
+        controller.abort();
+      } else {
+        externalSignal.addEventListener("abort", abortFromExternal, {
+          once: true,
+        });
+      }
     }
-    throw new ApiError(message, response.status, "http");
+    const timeoutId =
+      controller !== null
+        ? globalThis.setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+        : null;
+
+    try {
+      const method = (init?.method ?? "GET").toUpperCase();
+      const headers = new Headers(init?.headers ?? {});
+      if (!headers.has("Accept")) {
+        headers.set("Accept", "application/json");
+      }
+      if (
+        method !== "GET" &&
+        method !== "HEAD" &&
+        init?.body !== undefined &&
+        init?.body !== null &&
+        !headers.has("Content-Type")
+      ) {
+        headers.set("Content-Type", "application/json");
+      }
+
+      const response = await fetch(buildUrl(path, baseOverride), {
+        ...init,
+        method,
+        signal: controller?.signal ?? externalSignal,
+        headers,
+      });
+
+      const contentType = response.headers.get("content-type") ?? "";
+      const raw = await response.text();
+
+      if (!response.ok) {
+        let message = `HTTP ${response.status}`;
+        try {
+          const payload = JSON.parse(raw) as { message?: string };
+          if (payload?.message) message = payload.message;
+        } catch {
+          // ignore
+        }
+        throw new ApiError(message, response.status, "http");
+      }
+
+      if (!contentType.includes("application/json")) {
+        throw new ApiError(
+          "Server API tidak mengembalikan JSON yang valid.",
+          response.status,
+          "non-json",
+        );
+      }
+
+      try {
+        return JSON.parse(raw) as ApiResult<T>;
+      } catch {
+        throw new ApiError(
+          "Gagal membaca data dari server API.",
+          response.status,
+          "parse",
+        );
+      }
+    } catch (err) {
+      const isAbortError =
+        typeof err === "object" &&
+        err !== null &&
+        "name" in err &&
+        (err as { name?: unknown }).name === "AbortError";
+      const isUserAbort = Boolean(init?.signal?.aborted);
+      const error =
+        err instanceof ApiError
+          ? err
+          : new ApiError(
+              isAbortError
+                ? isUserAbort
+                  ? "Permintaan dibatalkan."
+                  : `Tidak dapat terhubung ke server API. Request timeout (${API_TIMEOUT_MS}ms).`
+                : `Tidak dapat terhubung ke server API. ${
+                    err instanceof Error ? err.message : "Network error"
+                  }`,
+              0,
+              isAbortError ? (isUserAbort ? "aborted" : "timeout") : "network",
+            );
+
+      if (attempt < API_MAX_ATTEMPTS && isRetryableApiError(error)) {
+        await sleep(250 * attempt);
+        continue;
+      }
+      throw error;
+    } finally {
+      if (timeoutId !== null) {
+        globalThis.clearTimeout(timeoutId);
+      }
+      if (externalSignal && controller) {
+        externalSignal.removeEventListener("abort", abortFromExternal);
+      }
+    }
   }
 
-  if (!contentType.includes("application/json")) {
-    throw new ApiError(
-      "Server API tidak mengembalikan JSON yang valid.",
-      response.status,
-      "non-json",
-    );
-  }
-
-  try {
-    return JSON.parse(raw) as ApiResult<T>;
-  } catch {
-    throw new ApiError(
-      "Gagal membaca data dari server API.",
-      response.status,
-      "parse",
-    );
-  }
+  throw new ApiError("Gagal mengambil data dari server API.", 0, "network");
 };
 
 export const fetchJson = async <T>(
@@ -382,8 +508,10 @@ export const fetchJson = async <T>(
     if (
       primaryBase === "/api" &&
       !isDoaPath(path) &&
+      canFallbackToMyQuran(path) &&
       err instanceof ApiError &&
       (err.code === "network" ||
+        err.code === "timeout" ||
         err.code === "non-json" ||
         (err.code === "http" && err.status === 404))
     ) {
@@ -399,6 +527,7 @@ export const fetchJson = async <T>(
       isDoaPath(path) &&
       err instanceof ApiError &&
       (err.code === "network" ||
+        err.code === "timeout" ||
         err.code === "non-json" ||
         (err.code === "http" && err.status === 404))
     ) {
@@ -406,6 +535,22 @@ export const fetchJson = async <T>(
       const status = primaryBase === "/api" ? "fallback" : "ok";
       setApiStatus(status, "equran");
       return result;
+    }
+    if (
+      primaryBase === "/api" &&
+      !isDoaPath(path) &&
+      !canFallbackToMyQuran(path) &&
+      err instanceof ApiError &&
+      (err.code === "network" ||
+        err.code === "timeout" ||
+        err.code === "non-json" ||
+        (err.code === "http" && err.status === 404))
+    ) {
+      throw new ApiError(
+        "Fitur ini membutuhkan koneksi ke Proxy API. Silakan coba lagi nanti.",
+        err.status,
+        err.code,
+      );
     }
     throw err;
   }

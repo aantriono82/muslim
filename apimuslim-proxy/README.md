@@ -7,6 +7,7 @@ Tambahan: modul Doa Harian diproxy ke EQuran (`https://equran.id/api/doa`) agar 
 - Proxy seluruh request ke API MyQuran
 - Dokumentasi Swagger UI (`/docs`)
 - OpenAPI JSON (`/openapi.json`)
+- Proxy audio (Quran.com & MyQuran) lewat endpoint `/api/audio`
 
 ## Prasyarat
 - Bun terpasang
@@ -42,6 +43,15 @@ GET  /api/doa/harian/random
 POST /api/doa/harian/cari
 ```
 
+### Audio Quran (Proxy)
+Endpoint audio:
+```bash
+GET /api/quran/juz/{number}/audio
+GET /api/audio?url={encoded_audio_url}
+```
+
+`/api/quran/juz/{number}/audio` mengembalikan daftar ayat dengan `audio_url` yang sudah diproxy.
+
 ## Dokumentasi
 - Swagger UI: `http://localhost:3000/docs`
 - OpenAPI JSON: `http://localhost:3000/openapi.json`
@@ -56,6 +66,11 @@ POST /api/doa/harian/cari
 - `DOA_ORIGIN` (default: `https://equran.id`)
 - `DOA_BASE` (default: `/api/doa`)
 - `DOA_TTL` (default: `3600`) cache daftar doa (detik)
+- `MAX_DOA_KEYWORD_LENGTH` (default: `100`) batas keyword pencarian doa
+- `QURANCOM_AUDIO_RECITER` (default: `7`)
+- `QURAN_AUDIO_ORIGIN` (default: `https://audio.qurancdn.com`)
+- `AUDIO_ALLOWED_HOSTS` (default: `audio.qurancdn.com,cdn.myquran.com,api.myquran.com`)
+- `MAX_PROXY_PAGES` (default: `120`) batas maksimal iterasi pagination upstream
 
 Contoh override base URL untuk docs:
 ```bash

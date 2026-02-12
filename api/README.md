@@ -21,7 +21,7 @@ bun install
 bun run dev
 ```
 
-Secara default server berjalan di `http://localhost:3000/api`.
+Secara default server berjalan di `http://localhost:4001/api`.
 
 ## Struktur Data Pengguna
 Field yang disimpan:
@@ -41,14 +41,14 @@ Query opsional:
 - `q` (pencarian nama/email)
 
 ```bash
-curl -s "http://localhost:3000/api/users?page=1&limit=10&q=andi"
+curl -s "http://localhost:4001/api/users?page=1&limit=10&q=andi"
 ```
 
 ### Detail pengguna
 `GET /api/users/:id`
 
 ```bash
-curl -s "http://localhost:3000/api/users/1"
+curl -s "http://localhost:4001/api/users/1"
 ```
 
 ### Tambah pengguna
@@ -58,7 +58,7 @@ Body JSON:
 - `email` (wajib)
 
 ```bash
-curl -s -X POST "http://localhost:3000/api/users" \
+curl -s -X POST "http://localhost:4001/api/users" \
   -H "Content-Type: application/json" \
   -d '{"name":"Andi","email":"andi@example.com"}'
 ```
@@ -70,7 +70,7 @@ Body JSON:
 - `email` (wajib)
 
 ```bash
-curl -s -X PUT "http://localhost:3000/api/users/1" \
+curl -s -X PUT "http://localhost:4001/api/users/1" \
   -H "Content-Type: application/json" \
   -d '{"name":"Andi Update","email":"andi@example.com"}'
 ```
@@ -82,7 +82,7 @@ Body JSON (opsional):
 - `email`
 
 ```bash
-curl -s -X PATCH "http://localhost:3000/api/users/1" \
+curl -s -X PATCH "http://localhost:4001/api/users/1" \
   -H "Content-Type: application/json" \
   -d '{"name":"Andi Baru"}'
 ```
@@ -91,7 +91,7 @@ curl -s -X PATCH "http://localhost:3000/api/users/1" \
 `DELETE /api/users/:id`
 
 ```bash
-curl -s -X DELETE "http://localhost:3000/api/users/1"
+curl -s -X DELETE "http://localhost:4001/api/users/1"
 ```
 
 ## Catatan Database

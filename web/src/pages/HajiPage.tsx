@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Flag, MapPin, MoonStar, Sun, Sunrise, Waypoints } from "lucide-react";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
@@ -162,6 +162,8 @@ const HajiPage = () => {
   const [hijriToCe, setHijriToCe] = useState<
     Record<string, CalendarInfo | null>
   >({});
+  const todayRequestRef = useRef(0);
+  const hijriInFlightRef = useRef<Set<string>>(new Set());
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
@@ -177,6 +179,9 @@ const HajiPage = () => {
   );
 
   useEffect(() => {
+    const requestId = todayRequestRef.current + 1;
+    todayRequestRef.current = requestId;
+    let active = true;
     setLoading(true);
     setError(null);
     fetchJsonCached<CalendarData>(todayPath, {
@@ -184,9 +189,21 @@ const HajiPage = () => {
       key: `haji-today-${method}-${adjustment}`,
       staleIfError: true,
     })
-      .then((res) => setToday(res.data ?? null))
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        if (!active || requestId !== todayRequestRef.current) return;
+        setToday(res.data ?? null);
+      })
+      .catch((err: Error) => {
+        if (!active || requestId !== todayRequestRef.current) return;
+        setError(err.message);
+      })
+      .finally(() => {
+        if (!active || requestId !== todayRequestRef.current) return;
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [adjustment, method, todayPath]);
 
   const hijriYear = today?.hijr.year ?? null;
@@ -194,10 +211,14 @@ const HajiPage = () => {
   useEffect(() => {
     if (!hijriYear) return;
     let active = true;
+    const requestedKeys: string[] = [];
     hajiDates.forEach((date) => {
       const hijriDate = buildHijriDate(hijriYear, 12, date.day);
       const cacheKey = `${hijriDate}|${method}|${adjustment}`;
       if (hijriToCe[cacheKey] !== undefined) return;
+      if (hijriInFlightRef.current.has(cacheKey)) return;
+      hijriInFlightRef.current.add(cacheKey);
+      requestedKeys.push(cacheKey);
       fetchJsonCached<CalendarData>(`/cal/ce/${hijriDate}?${query}`, {
         ttl: 12 * 60 * 60,
         key: `haji-hijr-${cacheKey}`,
@@ -205,19 +226,31 @@ const HajiPage = () => {
       })
         .then((res) => {
           if (!active) return;
-          setHijriToCe((prev) => ({
-            ...prev,
-            [cacheKey]: res.data?.ce ?? null,
-          }));
+          setHijriToCe((prev) =>
+            prev[cacheKey] !== undefined
+              ? prev
+              : {
+                  ...prev,
+                  [cacheKey]: res.data?.ce ?? null,
+                },
+          );
         })
         .catch(() => {
           if (!active) return;
-          setHijriToCe((prev) => ({ ...prev, [cacheKey]: null }));
+          setHijriToCe((prev) =>
+            prev[cacheKey] !== undefined ? prev : { ...prev, [cacheKey]: null },
+          );
+        })
+        .finally(() => {
+          hijriInFlightRef.current.delete(cacheKey);
         });
     });
 
     return () => {
       active = false;
+      requestedKeys.forEach((cacheKey) => {
+        hijriInFlightRef.current.delete(cacheKey);
+      });
     };
   }, [adjustment, hijriYear, hijriToCe, method, query]);
 

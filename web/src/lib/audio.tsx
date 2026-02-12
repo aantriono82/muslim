@@ -12,10 +12,16 @@ export type AudioTrack = {
   title: string;
   subtitle?: string;
   src: string;
+  segment?: {
+    id?: string;
+    startTime?: number;
+    endTime?: number;
+  };
   sourceLabel?: string;
   quality?: string;
   format?: string;
   module?: string;
+  meta?: Record<string, unknown>;
 };
 
 type AudioContextValue = {
@@ -30,12 +36,17 @@ type AudioContextValue = {
   lastByModule: Record<string, AudioTrack>;
   setTrack: (track: AudioTrack | null) => void;
   setQueue: (tracks: AudioTrack[], startIndex?: number) => void;
+  appendQueue: (tracks: AudioTrack[]) => void;
   setQueueByTrack: (track: AudioTrack) => void;
   jumpTo: (index: number) => void;
   next: (options?: { wrap?: boolean }) => void;
   prev: (options?: { wrap?: boolean }) => void;
   toggleShuffle: () => void;
   setShuffle: (value: boolean) => void;
+  progress: number;
+  duration: number;
+  setProgress: (value: number) => void;
+  setDuration: (value: number) => void;
   setRepeatMode: (mode: "off" | "one" | "all") => void;
   setPlaybackRate: (rate: number) => void;
 };
@@ -173,6 +184,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [lastByModule, setLastByModule] = useState<Record<string, AudioTrack>>(
     () => readStoredLastByModule(MODULE_LAST_KEY),
   );
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const track = queue[currentIndex] ?? null;
 
@@ -204,6 +217,11 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     setQueueState(tracks);
     setCurrentIndex(safeIndex);
     setLastAction("user");
+  }, []);
+
+  const appendQueue = useCallback((tracks: AudioTrack[]) => {
+    if (!tracks.length) return;
+    setQueueState((prev) => (prev.length ? [...prev, ...tracks] : tracks));
   }, []);
 
   const jumpTo = useCallback(
@@ -385,12 +403,17 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       lastByModule,
       setTrack,
       setQueue,
+      appendQueue,
       setQueueByTrack,
       jumpTo,
       next,
       prev,
       toggleShuffle,
       setShuffle,
+      progress,
+      duration,
+      setProgress,
+      setDuration,
       setRepeatMode,
       setPlaybackRate,
     }),
@@ -406,12 +429,17 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       lastByModule,
       setTrack,
       setQueue,
+      appendQueue,
       setQueueByTrack,
       jumpTo,
       next,
       prev,
       toggleShuffle,
       setShuffle,
+      progress,
+      duration,
+      setProgress,
+      setDuration,
       setRepeatMode,
       setPlaybackRate,
     ],

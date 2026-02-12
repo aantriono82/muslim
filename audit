@@ -24,6 +24,7 @@ run_step "Audit Web (unit)" "web" npm run test
 run_step "Audit Web (typecheck)" "web" npx tsc --noEmit
 run_step "Audit Web (build)" "web" npm run build
 run_step "Audit Web (visual)" "web" npm run test:visual
+run_step "Audit Web (pwa)" "web" npm run test:pwa
 
 echo ""
 echo "Audit selesai tanpa error."

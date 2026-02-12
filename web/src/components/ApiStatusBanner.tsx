@@ -42,14 +42,22 @@ const ApiStatusBanner = () => {
 
   if (showRecovery && status === "ok") {
     return (
-      <div className="bg-emerald-50 py-2 text-center text-xs text-emerald-800">
+      <div
+        className="bg-emerald-50 py-2 text-center text-xs text-emerald-800"
+        role="status"
+        aria-live="polite"
+      >
         Proxy API aktif kembali.
       </div>
     );
   }
 
   return (
-    <div className="bg-red-50 py-2 text-center text-xs text-red-800">
+    <div
+      className="bg-red-50 py-2 text-center text-xs text-red-800"
+      role="status"
+      aria-live="polite"
+    >
       <span>
         Proxy API tidak aktif, memakai {sourceLabel}. Beberapa fitur mungkin
         terbatas.

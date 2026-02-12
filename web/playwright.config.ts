@@ -4,6 +4,7 @@ const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: /.*pwa\.spec\.ts/,
   timeout: 60 * 1000,
   expect: {
     toHaveScreenshot: {

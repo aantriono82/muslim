@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Container from "../components/Container";
 import SectionHeader from "../components/SectionHeader";
 import { Card } from "../components/State";
@@ -10,12 +11,12 @@ const DisclaimerPage = () => {
           title="Disclaimer"
           subtitle="Informasi disajikan sebagai referensi dan tidak menggantikan rujukan resmi."
           action={
-            <a
-              href="/"
+            <Link
+              to="/"
               className="rounded-full border border-emerald-200 px-4 py-2 text-xs font-semibold text-emerald-700"
             >
               Kembali
-            </a>
+            </Link>
           }
         />
 

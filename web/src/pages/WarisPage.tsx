@@ -7,6 +7,7 @@ import {
   calculateWaris,
   type HeirInput,
   type HeirRelation,
+  type WarisResult,
 } from "../lib/waris";
 
 const heirOptions: Array<{ value: HeirRelation; label: string; max?: number }> =
@@ -122,6 +123,8 @@ const parseNumber = (value: string) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const toNonNegative = (value: number) => (value > 0 ? value : 0);
+
 const polarToCartesian = (
   centerX: number,
   centerY: number,
@@ -155,15 +158,77 @@ const WarisPage = () => {
     { relation: "husband", count: 1 },
   ]);
 
+  const numericInput = useMemo(() => {
+    const totalWealthValue = toNonNegative(parseNumber(totalWealth));
+    const debtsValue = toNonNegative(parseNumber(debts));
+    const funeralCostValue = toNonNegative(parseNumber(funeralCost));
+    const wasiatValue = toNonNegative(parseNumber(wasiat));
+    return {
+      totalWealth: totalWealthValue,
+      debts: debtsValue,
+      funeralCost: funeralCostValue,
+      wasiat: wasiatValue,
+      distributable: Math.max(
+        0,
+        totalWealthValue - debtsValue - funeralCostValue - wasiatValue,
+      ),
+    };
+  }, [debts, funeralCost, totalWealth, wasiat]);
+
+  const validationIssues = useMemo(() => {
+    const totals = new Map<HeirRelation, number>();
+    heirs.forEach((heir) => {
+      const count = Number.isFinite(heir.count) ? Math.max(heir.count, 0) : 0;
+      if (count <= 0) return;
+      totals.set(heir.relation, (totals.get(heir.relation) ?? 0) + count);
+    });
+
+    const issues: string[] = [];
+    if ((totals.get("husband") ?? 0) > 0 && (totals.get("wife") ?? 0) > 0) {
+      issues.push(
+        "Data tidak valid: suami dan istri tidak bisa hadir bersamaan dalam satu kasus waris.",
+      );
+    }
+
+    heirOptions.forEach((option) => {
+      if (!option.max) return;
+      const count = totals.get(option.value) ?? 0;
+      if (count > option.max) {
+        issues.push(
+          `Data tidak valid: ${option.label} maksimal ${option.max} orang.`,
+        );
+      }
+    });
+
+    return issues;
+  }, [heirs]);
+
   const result = useMemo(() => {
+    if (validationIssues.length > 0) {
+      return {
+        distributable: numericInput.distributable,
+        totalWealth: numericInput.totalWealth,
+        debts: numericInput.debts,
+        funeralCost: numericInput.funeralCost,
+        wasiat: numericInput.wasiat,
+        results: [],
+        totalShare: 0,
+        remainder: numericInput.distributable,
+        notes: [
+          ...validationIssues,
+          "Perbaiki data ahli waris agar pembagian bisa dihitung.",
+        ],
+      } satisfies WarisResult;
+    }
+
     return calculateWaris(
-      parseNumber(totalWealth),
-      parseNumber(debts),
-      parseNumber(funeralCost),
-      parseNumber(wasiat),
+      numericInput.totalWealth,
+      numericInput.debts,
+      numericInput.funeralCost,
+      numericInput.wasiat,
       heirs,
     );
-  }, [totalWealth, debts, funeralCost, wasiat, heirs]);
+  }, [heirs, numericInput, validationIssues]);
 
   const maxAmount = Math.max(0, ...result.results.map((item) => item.amount));
 
@@ -206,7 +271,7 @@ const WarisPage = () => {
     setDebts(template.debts);
     setFuneralCost(template.funeralCost);
     setWasiat(template.wasiat);
-    setHeirs(template.heirs);
+    setHeirs(template.heirs.map((item) => ({ ...item })));
   };
 
   return (
@@ -233,6 +298,7 @@ const WarisPage = () => {
                 <input
                   value={totalWealth}
                   onChange={(event) => setTotalWealth(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -241,6 +307,7 @@ const WarisPage = () => {
                 <input
                   value={debts}
                   onChange={(event) => setDebts(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -249,6 +316,7 @@ const WarisPage = () => {
                 <input
                   value={funeralCost}
                   onChange={(event) => setFuneralCost(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -257,6 +325,7 @@ const WarisPage = () => {
                 <input
                   value={wasiat}
                   onChange={(event) => setWasiat(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -301,9 +370,20 @@ const WarisPage = () => {
                       value={heir.relation}
                       onChange={(event) => {
                         const value = event.target.value as HeirRelation;
+                        const max = heirOptions.find(
+                          (item) => item.value === value,
+                        )?.max;
                         setHeirs((prev) =>
                           prev.map((item, idx) =>
-                            idx === index ? { ...item, relation: value } : item,
+                            idx === index
+                              ? {
+                                  ...item,
+                                  relation: value,
+                                  count: max
+                                    ? Math.min(Math.max(item.count, 0), max)
+                                    : Math.max(item.count, 0),
+                                }
+                              : item,
                           ),
                         );
                       }}
@@ -320,8 +400,12 @@ const WarisPage = () => {
                       min="0"
                       value={heir.count}
                       onChange={(event) => {
-                        const value =
+                        const parsed =
                           Number.parseInt(event.target.value, 10) || 0;
+                        const max = option?.max;
+                        const value = max
+                          ? Math.min(Math.max(parsed, 0), max)
+                          : Math.max(parsed, 0);
                         setHeirs((prev) =>
                           prev.map((item, idx) =>
                             idx === index ? { ...item, count: value } : item,
@@ -350,6 +434,13 @@ const WarisPage = () => {
                 );
               })}
             </div>
+            {validationIssues.length > 0 ? (
+              <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700">
+                {validationIssues.map((issue) => (
+                  <p key={issue}>• {issue}</p>
+                ))}
+              </div>
+            ) : null}
             <button
               type="button"
               onClick={handleAdd}
@@ -460,14 +551,16 @@ const WarisPage = () => {
                         key={`legend-${index}`}
                         className="flex items-center justify-between gap-2"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
                           <span
                             className="h-2 w-2 rounded-full"
                             style={{ background: item.color }}
                           />
-                          <span>{item.label}</span>
+                          <span className="min-w-0 break-words">
+                            {item.label}
+                          </span>
                         </div>
-                        <span>
+                        <span className="shrink-0">
                           {Math.round(item.percent * 100)}% ·{" "}
                           {formatCurrency(item.amount)}
                         </span>
@@ -485,9 +578,13 @@ const WarisPage = () => {
                     const barColor = relationColors[item.relation] ?? "#10B981";
                     return (
                       <div key={`bar-${index}`}>
-                        <div className="flex items-center justify-between text-xs text-textSecondary">
-                          <span>{item.label}</span>
-                          <span>{formatCurrency(item.amount)}</span>
+                        <div className="flex items-center justify-between gap-2 text-xs text-textSecondary">
+                          <span className="min-w-0 flex-1 break-words">
+                            {item.label}
+                          </span>
+                          <span className="shrink-0">
+                            {formatCurrency(item.amount)}
+                          </span>
                         </div>
                         <div className="mt-1 h-2 rounded-full bg-emerald-50">
                           <div

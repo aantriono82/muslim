@@ -30,6 +30,12 @@ https://almatsurat.net/kubro/
 https://archive.org/details/al-matsurat-kubro-shugro-pagi-dan-petang
 ```
 
+Kalibrasi segmen audio manual (opsional):
+```txt
+/matsurat?matsuratCalibrate=1
+```
+Override tersimpan di localStorage key `ibadahmu:matsurat-segment-overrides`.
+
 ## Fitur Phase 4
 - Waris calculator (faraidh ringkas) mencakup pasangan, orang tua, anak, kakek/nenek, dan saudara kandung.
 - Template kasus cepat, visualisasi pie + bar, dan export JSON.
@@ -49,6 +55,14 @@ Atau dengan Bun:
 ```bash
 bun install
 bun run dev
+```
+
+## Deploy Cloudflare Pages
+Set nama project Pages di environment, lalu jalankan deploy dari folder `web`.
+```bash
+cd /home/aantriono/Code/muslim/web
+export CF_PAGES_PROJECT="nama-project-pages"
+npm run deploy:cloudflare
 ```
 
 ## Konfigurasi API

@@ -16,6 +16,10 @@ const parseNumber = (value: string) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const toNonNegative = (value: number) => (value > 0 ? value : 0);
+const toWholeNonNegative = (value: number) =>
+  value > 0 ? Math.floor(value) : 0;
+
 const ZakatPage = () => {
   const [maalAssets, setMaalAssets] = useState("0");
   const [maalDebts, setMaalDebts] = useState("0");
@@ -26,10 +30,10 @@ const ZakatPage = () => {
   const [ricePerPerson, setRicePerPerson] = useState("2.5");
 
   const maal = useMemo(() => {
-    const assets = parseNumber(maalAssets);
-    const debts = parseNumber(maalDebts);
+    const assets = toNonNegative(parseNumber(maalAssets));
+    const debts = toNonNegative(parseNumber(maalDebts));
     const net = Math.max(0, assets - debts);
-    const gold = parseNumber(goldPrice);
+    const gold = toNonNegative(parseNumber(goldPrice));
     const nisab = gold * 85;
     const eligible = nisab > 0 && net >= nisab;
     const zakat = eligible ? net * 0.025 : 0;
@@ -37,9 +41,9 @@ const ZakatPage = () => {
   }, [maalAssets, maalDebts, goldPrice]);
 
   const fitrah = useMemo(() => {
-    const count = parseNumber(people);
-    const price = parseNumber(ricePrice);
-    const perPerson = parseNumber(ricePerPerson);
+    const count = toWholeNonNegative(parseNumber(people));
+    const price = toNonNegative(parseNumber(ricePrice));
+    const perPerson = toNonNegative(parseNumber(ricePerPerson));
     const total = count * price * perPerson;
     return { count, price, perPerson, total };
   }, [people, ricePrice, ricePerPerson]);
@@ -49,12 +53,14 @@ const ZakatPage = () => {
       <Container>
         <SectionHeader
           title="Kalkulator Zakat"
-          subtitle="Hitung zakat maal dan zakat fitrah dengan cepat."
+          subtitle="Hitung zakat harta dan zakat fitrah dengan cepat."
         />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <Card>
-            <h3 className="text-sm font-semibold text-textPrimary">Zakat Maal</h3>
+            <h3 className="text-sm font-semibold text-textPrimary">
+              Zakat Maal
+            </h3>
             <p className="mt-1 text-xs text-textSecondary">
               Nisab setara 85 gram emas. Masukkan harga emas per gram terbaru.
             </p>
@@ -64,6 +70,7 @@ const ZakatPage = () => {
                 <input
                   value={maalAssets}
                   onChange={(event) => setMaalAssets(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -72,6 +79,7 @@ const ZakatPage = () => {
                 <input
                   value={maalDebts}
                   onChange={(event) => setMaalDebts(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -80,6 +88,7 @@ const ZakatPage = () => {
                 <input
                   value={goldPrice}
                   onChange={(event) => setGoldPrice(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -92,13 +101,15 @@ const ZakatPage = () => {
                 Status: {maal.eligible ? "Wajib Zakat" : "Belum mencapai nisab"}
               </p>
               <p className="mt-2 text-base font-semibold text-textPrimary">
-                Zakat Maal: {formatCurrency(maal.zakat)}
+                Total Zakat: {formatCurrency(maal.zakat)}
               </p>
             </div>
           </Card>
 
           <Card>
-            <h3 className="text-sm font-semibold text-textPrimary">Zakat Fitrah</h3>
+            <h3 className="text-sm font-semibold text-textPrimary">
+              Zakat Fitrah
+            </h3>
             <p className="mt-1 text-xs text-textSecondary">
               Standar 2.5 kg beras per orang. Sesuaikan harga beras lokal.
             </p>
@@ -108,6 +119,7 @@ const ZakatPage = () => {
                 <input
                   value={people}
                   onChange={(event) => setPeople(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -116,6 +128,7 @@ const ZakatPage = () => {
                 <input
                   value={ricePrice}
                   onChange={(event) => setRicePrice(event.target.value)}
+                  inputMode="numeric"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -124,6 +137,7 @@ const ZakatPage = () => {
                 <input
                   value={ricePerPerson}
                   onChange={(event) => setRicePerPerson(event.target.value)}
+                  inputMode="decimal"
                   className="mt-1 w-full rounded-lg border border-emerald-100 px-3 py-2 text-sm"
                 />
               </label>
@@ -131,7 +145,8 @@ const ZakatPage = () => {
 
             <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-textSecondary">
               <p>
-                Total: {fitrah.count} orang × {fitrah.perPerson} kg × {formatCurrency(fitrah.price)}
+                Total: {fitrah.count} orang × {fitrah.perPerson} kg ×{" "}
+                {formatCurrency(fitrah.price)}
               </p>
               <p className="mt-2 text-base font-semibold text-textPrimary">
                 Zakat Fitrah: {formatCurrency(fitrah.total)}

@@ -17,7 +17,8 @@ export const matsuratItems: MatsuratItem[] = [
     time: "pagi",
     arabic: `أَعُوذُ بِاللَّهِ السَّمِيعِ الْعَلِيمِ مِنَ الشَّيْطَانِ الرَّجِيمِ`,
     translation: `Aku berlindung kepada Allah yang Maha Mendengar lagi Maha Mengetahui dari godaan syetan yang terkutuk.`,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "taawwudz-0-sore",
@@ -25,7 +26,8 @@ export const matsuratItems: MatsuratItem[] = [
     time: "sore",
     arabic: `أَعُوذُ بِاللَّهِ السَّمِيعِ الْعَلِيمِ مِنَ الشَّيْطَانِ الرَّجِيمِ`,
     translation: `Aku berlindung kepada Allah yang Maha Mendengar lagi Maha Mengetahui dari godaan syetan yang terkutuk.`,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-fatihah-1-pagi",
@@ -46,7 +48,8 @@ Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pert
 Tunjukilah kami jalan yang lurus
 (yaitu) jalan orang-orang yang telah Engkau anugerahkan nikmat kepada mereka, bukan (jalan) mereka yang dimurkai dan bukan (pula jalan) mereka yang sesat`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-fatihah-1-sore",
@@ -67,7 +70,8 @@ Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pert
 Tunjukilah kami jalan yang lurus
 (yaitu) jalan orang-orang yang telah Engkau anugerahkan nikmat kepada mereka, bukan (jalan) mereka yang dimurkai dan bukan (pula jalan) mereka yang sesat`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-baqarah-2-pagi",
@@ -85,7 +89,8 @@ Kitab (Al Qur'an) ini tidak ada keraguan padanya; petunjuk bagi mereka yang bert
 Dan mereka yang beriman kepada Kitab (AlQur'an) yang telah diturunkan kepadamu dan Kitab-kitab yang telah diturunkan sebelummu, serta mereka yakin akan adanya (kehidupan) akhirat
 Mereka itulah yang tetap mendapat petunjuk dari Tuhan mereka, dan merekalah orang-orang yang beruntung`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-baqarah-2-sore",
@@ -103,7 +108,8 @@ Kitab (Al Qur'an) ini tidak ada keraguan padanya; petunjuk bagi mereka yang bert
 Dan mereka yang beriman kepada Kitab (AlQur'an) yang telah diturunkan kepadamu dan Kitab-kitab yang telah diturunkan sebelummu, serta mereka yakin akan adanya (kehidupan) akhirat
 Mereka itulah yang tetap mendapat petunjuk dari Tuhan mereka, dan merekalah orang-orang yang beruntung`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-baqarah-3-pagi",
@@ -112,7 +118,8 @@ Mereka itulah yang tetap mendapat petunjuk dari Tuhan mereka, dan merekalah oran
     arabic: `ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلۡحَيُّ ٱلۡقَيُّومُۚ لَا تَأۡخُذُهُۥ سِنَةٞ وَلَا نَوۡمٞۚ لَّهُۥ مَا فِي ٱلسَّمَٰوَٰتِ وَمَا فِي ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِي يَشۡفَعُ عِندَهُۥٓ إِلَّا بِإِذۡنِهِۦۚ يَعۡلَمُ مَا بَيۡنَ أَيۡدِيهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا يُحِيطُونَ بِشَيۡءٖ مِّنۡ عِلۡمِهِۦٓ إِلَّا بِمَا شَآءَۚ وَسِعَ كُرۡسِيُّهُ ٱلسَّمَٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَايَئُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِيُّ ٱلۡعَظِيمُ`,
     translation: `Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia Yang Hidup kekal lagi terus menerus mengurus (makhluk-Nya); tidak mengantuk dan tidak tidur. Kepunyaan-Nya apa yang di langit dan di bumi. Tiada yang dapat memberi syafaat di sisi Allah tanpa izin-Nya. Allah mengetahui apa-apa yang di hadapan mereka dan di belakang mereka, dan mereka tidak mengetahui apa-apa dari ilmu Allah melainkan apa yang dikehendaki-Nya. Kursi Allah meliputi langit dan bumi. Dan Allah tidak merasa berat memelihara keduanya, dan Allah Maha Tinggi lagi Maha Besar`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-baqarah-3-sore",
@@ -121,7 +128,8 @@ Mereka itulah yang tetap mendapat petunjuk dari Tuhan mereka, dan merekalah oran
     arabic: `ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلۡحَيُّ ٱلۡقَيُّومُۚ لَا تَأۡخُذُهُۥ سِنَةٞ وَلَا نَوۡمٞۚ لَّهُۥ مَا فِي ٱلسَّمَٰوَٰتِ وَمَا فِي ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِي يَشۡفَعُ عِندَهُۥٓ إِلَّا بِإِذۡنِهِۦۚ يَعۡلَمُ مَا بَيۡنَ أَيۡدِيهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا يُحِيطُونَ بِشَيۡءٖ مِّنۡ عِلۡمِهِۦٓ إِلَّا بِمَا شَآءَۚ وَسِعَ كُرۡسِيُّهُ ٱلسَّمَٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَايَئُودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِيُّ ٱلۡعَظِيمُ`,
     translation: `Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia Yang Hidup kekal lagi terus menerus mengurus (makhluk-Nya); tidak mengantuk dan tidak tidur. Kepunyaan-Nya apa yang di langit dan di bumi. Tiada yang dapat memberi syafaat di sisi Allah tanpa izin-Nya. Allah mengetahui apa-apa yang di hadapan mereka dan di belakang mereka, dan mereka tidak mengetahui apa-apa dari ilmu Allah melainkan apa yang dikehendaki-Nya. Kursi Allah meliputi langit dan bumi. Dan Allah tidak merasa berat memelihara keduanya, dan Allah Maha Tinggi lagi Maha Besar`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-baqarah-4-pagi",
@@ -132,7 +140,8 @@ Mereka itulah yang tetap mendapat petunjuk dari Tuhan mereka, dan merekalah oran
     translation: `Tidak ada paksaan untuk (memasuki) agama (Islam); sesungguhnya telah jelas jalan yang benar daripada jalan yang sesat. Karena itu barang siapa yang ingkar kepada Thaghut dan beriman kepada Allah, maka sesungguhnya ia telah berpegang kepada buhu tali yang amat kuat yang tidak akan putus. Dan Allah Maha Mendengar lagi Maha Mengetahui.
 Allah Pelindung orang-orang yang beriman; Dia mengeluarkan mereka dari kegelapan (kekafiran) kepada cahaya (iman). Dan orang-orang yang kafir, pelindung-pelindungnya ialah setan, yang mengeluarkan mereka dari cahaya kepada kegelapan (kekafiran). Mereka itu adalah penghuni neraka; mereka kekal di dalamnya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-baqarah-4-sore",
@@ -143,7 +152,8 @@ Allah Pelindung orang-orang yang beriman; Dia mengeluarkan mereka dari kegelapan
     translation: `Tidak ada paksaan untuk (memasuki) agama (Islam); sesungguhnya telah jelas jalan yang benar daripada jalan yang sesat. Karena itu barang siapa yang ingkar kepada Thaghut dan beriman kepada Allah, maka sesungguhnya ia telah berpegang kepada buhu tali yang amat kuat yang tidak akan putus. Dan Allah Maha Mendengar lagi Maha Mengetahui.
 Allah Pelindung orang-orang yang beriman; Dia mengeluarkan mereka dari kegelapan (kekafiran) kepada cahaya (iman). Dan orang-orang yang kafir, pelindung-pelindungnya ialah setan, yang mengeluarkan mereka dari cahaya kepada kegelapan (kekafiran). Mereka itu adalah penghuni neraka; mereka kekal di dalamnya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-baqarah-5-pagi",
@@ -156,7 +166,8 @@ Allah Pelindung orang-orang yang beriman; Dia mengeluarkan mereka dari kegelapan
 Rasul telah beriman kepada Al Qur'an yang diturunkan kepadanya dari Tuhannya, demikian pula orang-orang yang beriman. Semuanya beriman kepada Allah, malaikat-malaikat-Nya, kitab-kitab-Nya dan rasul-rasul-Nya. (Mereka mengatakan): "Kami tidak membeda-bedakan antara seseorang pun (dengan yang lain) dari rasul rasul-Nya", dan mereka mengatakan: "Kami dengar dan kami taat". (Mereka berdoa):"Ampunilah kami ya Tuhan kami dan kepada Engkaulah tempat kembali"
 Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya. Ia mendapat pahala (dari kebajikan) yang diusahakannya dan ia mendapat siksa (dari kejahatan) yang dikerjakannya. (Mereka berdo\`a): "Ya Tuhan kami, janganlah Engkau hukum kami jika kami lupa atau kami tersalah. Ya Tuhan kami, janganlah Engkau bebankan kepada kami beban yang berat sebagaimana Engkau bebankan kepada orang-orang yang sebelum kami. Ya Tuhan kami, janganlah Engkau pikulkan kepada kami apa yang tak sanggup kami memikulnya. Beri maaflah kami; ampunilah kami; dan rahmatilah kami. Engkaulah Penolong kami, maka tolonglah kami terhadap kaum yang kafir"`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-baqarah-5-sore",
@@ -169,7 +180,8 @@ Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya. Ia menda
 Rasul telah beriman kepada Al Qur'an yang diturunkan kepadanya dari Tuhannya, demikian pula orang-orang yang beriman. Semuanya beriman kepada Allah, malaikat-malaikat-Nya, kitab-kitab-Nya dan rasul-rasul-Nya. (Mereka mengatakan): "Kami tidak membeda-bedakan antara seseorang pun (dengan yang lain) dari rasul rasul-Nya", dan mereka mengatakan: "Kami dengar dan kami taat". (Mereka berdoa):"Ampunilah kami ya Tuhan kami dan kepada Engkaulah tempat kembali"
 Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya. Ia mendapat pahala (dari kebajikan) yang diusahakannya dan ia mendapat siksa (dari kejahatan) yang dikerjakannya. (Mereka berdo\`a): "Ya Tuhan kami, janganlah Engkau hukum kami jika kami lupa atau kami tersalah. Ya Tuhan kami, janganlah Engkau bebankan kepada kami beban yang berat sebagaimana Engkau bebankan kepada orang-orang yang sebelum kami. Ya Tuhan kami, janganlah Engkau pikulkan kepada kami apa yang tak sanggup kami memikulnya. Beri maaflah kami; ampunilah kami; dan rahmatilah kami. Engkaulah Penolong kami, maka tolonglah kami terhadap kaum yang kafir"`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "ali-imran-6-pagi",
@@ -181,7 +193,8 @@ Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya. Ia menda
     translation: `Alif Lam Mim
 Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia. Yang Hidup kekal lagi terus menerus mengurus makhluk-Nya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "ali-imran-6-sore",
@@ -193,7 +206,8 @@ Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia. Yang Hidup kekal la
     translation: `Alif Lam Mim
 Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia. Yang Hidup kekal lagi terus menerus mengurus makhluk-Nya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "thoha-7-pagi",
@@ -204,7 +218,8 @@ Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia. Yang Hidup kekal la
     translation: `Dan tunduklah semua muka (dengan berendah diri) kepada Tuhan Yang Hidup Kekal lagi senantiasa mengurus (makhluk-Nya). Dan sesungguhnya telah merugilah orang yang melakukan kelaliman
 Dan barang siapa mengerjakan amal-amal yang saleh dan ia dalam keadaan beriman, maka ia tidak khawatir akan perlakuan yang tidak adil (terhadapnya) dan tidak (pula) akan pengurangan haknya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "thoha-7-sore",
@@ -215,7 +230,8 @@ Dan barang siapa mengerjakan amal-amal yang saleh dan ia dalam keadaan beriman, 
     translation: `Dan tunduklah semua muka (dengan berendah diri) kepada Tuhan Yang Hidup Kekal lagi senantiasa mengurus (makhluk-Nya). Dan sesungguhnya telah merugilah orang yang melakukan kelaliman
 Dan barang siapa mengerjakan amal-amal yang saleh dan ia dalam keadaan beriman, maka ia tidak khawatir akan perlakuan yang tidak adil (terhadapnya) dan tidak (pula) akan pengurangan haknya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "at-taubah-8-pagi",
@@ -224,7 +240,8 @@ Dan barang siapa mengerjakan amal-amal yang saleh dan ia dalam keadaan beriman, 
     arabic: `حَسۡبِيَ ٱللَّهُ لَآإِلَٰهَ إِلَّاهُوَۖ عَلَيۡهِ تَوَكَّلۡتُۖ وَهُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِيمِ`,
     translation: `"Cukuplah Allah bagiku; tidak ada Tuhanselain Dia. Hanya kepada-Nya aku bertawakal dan Dia adalah Tuhan yang memiliki Arasy yang agung"`,
     repeat: 7,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "at-taubah-8-sore",
@@ -233,7 +250,8 @@ Dan barang siapa mengerjakan amal-amal yang saleh dan ia dalam keadaan beriman, 
     arabic: `حَسۡبِيَ ٱللَّهُ لَآإِلَٰهَ إِلَّاهُوَۖ عَلَيۡهِ تَوَكَّلۡتُۖ وَهُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِيمِ`,
     translation: `"Cukuplah Allah bagiku; tidak ada Tuhanselain Dia. Hanya kepada-Nya aku bertawakal dan Dia adalah Tuhan yang memiliki Arasy yang agung"`,
     repeat: 7,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-isra-9-pagi",
@@ -244,7 +262,8 @@ Dan barang siapa mengerjakan amal-amal yang saleh dan ia dalam keadaan beriman, 
     translation: `Katakanlah: "Serulah Allah atau serulahAr-Rahman. Dengan nama yang mana saja kamu seru, Diamempunyai al asmaaulhusna (nama-nama yang terbaik)dan janganlah kamu mengeraskan suaramu dalam salatmudan janganlah pula merendahkannya dan carilah jalantengah di antara kedua itu"
 Dan katakanlah: "Segala puji bagi AllahYang tidak mempunyai anak dan tidak mempunyai sekutudalam kerajaan-Nya dan Dia bukan pula hina yangmemerlukan penolong dan agungkanlah Dia denganpengagungan yang sebesar-besarnya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-isra-9-sore",
@@ -255,7 +274,8 @@ Dan katakanlah: "Segala puji bagi AllahYang tidak mempunyai anak dan tidak mempu
     translation: `Katakanlah: "Serulah Allah atau serulahAr-Rahman. Dengan nama yang mana saja kamu seru, Diamempunyai al asmaaulhusna (nama-nama yang terbaik)dan janganlah kamu mengeraskan suaramu dalam salatmudan janganlah pula merendahkannya dan carilah jalantengah di antara kedua itu"
 Dan katakanlah: "Segala puji bagi AllahYang tidak mempunyai anak dan tidak mempunyai sekutudalam kerajaan-Nya dan Dia bukan pula hina yangmemerlukan penolong dan agungkanlah Dia denganpengagungan yang sebesar-besarnya`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-mu-minun-10-pagi",
@@ -270,7 +290,8 @@ Maka Maha Tinggi Allah, Raja Yang Sebenarnya; tidak ada Tuhan (yang berhak disem
 Dan barang siapa menyembah tuhan yang lain di samping Allah, padahal tidak ada suatu dalil pun baginya tentang itu, maka sesungguhnya perhitungannya di sisi Tuhannya. Sesungguhnya orang-orang yang kafir itu tiada beruntung
 Dan katakanlah: "Ya Tuhanku berilah ampun dan berilah rahmat, dan Engkau adalah Pemberi rahmat Yang Paling baik`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-mu-minun-10-sore",
@@ -285,7 +306,8 @@ Maka Maha Tinggi Allah, Raja Yang Sebenarnya; tidak ada Tuhan (yang berhak disem
 Dan barang siapa menyembah tuhan yang lain di samping Allah, padahal tidak ada suatu dalil pun baginya tentang itu, maka sesungguhnya perhitungannya di sisi Tuhannya. Sesungguhnya orang-orang yang kafir itu tiada beruntung
 Dan katakanlah: "Ya Tuhanku berilah ampun dan berilah rahmat, dan Engkau adalah Pemberi rahmat Yang Paling baik`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "ar-rum-11-pagi",
@@ -312,7 +334,8 @@ Dan di antara tanda-tanda kekuasaan-Nya, Dia memperlihatkan kepadamu kilat untuk
 Dan di antara tanda-tanda kekuasaan-Nya ialah berdirinya langit dan bumi dengan iradat-Nya. Kemudian apabila Dia memanggil kamu sekali panggil dari bumi, seketika itu juga kamu keluar dari kubur
 Dan kepunyaan-Nya-lah siapa saja yang ada di langit dan di bumi. Semuanya hanya kepada-Nya tunduk`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "ar-rum-11-sore",
@@ -339,7 +362,8 @@ Dan di antara tanda-tanda kekuasaan-Nya, Dia memperlihatkan kepadamu kilat untuk
 Dan di antara tanda-tanda kekuasaan-Nya ialah berdirinya langit dan bumi dengan iradat-Nya. Kemudian apabila Dia memanggil kamu sekali panggil dari bumi, seketika itu juga kamu keluar dari kubur
 Dan kepunyaan-Nya-lah siapa saja yang ada di langit dan di bumi. Semuanya hanya kepada-Nya tunduk`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "ghafir-12-pagi",
@@ -352,7 +376,8 @@ Dan kepunyaan-Nya-lah siapa saja yang ada di langit dan di bumi. Semuanya hanya 
 Diturunkan Kitab ini (Al Quran) dari Allah Yang Maha Perkasa lagi Maha Mengetahui
 Yang Mengampuni dosa dan Menerima taubat lagi keras hukuman-Nya. Yang mempunyai karunia. Tiada Tuhan (yang berhak disembah) selain Dia. Hanya kepada-Nya-lah kembali (semua makhluk)`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "ghafir-12-sore",
@@ -365,7 +390,8 @@ Yang Mengampuni dosa dan Menerima taubat lagi keras hukuman-Nya. Yang mempunyai 
 Diturunkan Kitab ini (Al Quran) dari Allah Yang Maha Perkasa lagi Maha Mengetahui
 Yang Mengampuni dosa dan Menerima taubat lagi keras hukuman-Nya. Yang mempunyai karunia. Tiada Tuhan (yang berhak disembah) selain Dia. Hanya kepada-Nya-lah kembali (semua makhluk)`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-hasyr-13-pagi",
@@ -378,7 +404,8 @@ Yang Mengampuni dosa dan Menerima taubat lagi keras hukuman-Nya. Yang mempunyai 
 Dialah Allah Yang tiada Tuhan selain Dia, Raja, Yang Maha Suci, Yang Maha Sejahtera, Yang Mengaruniakan Keamanan, Yang Maha Memelihara, Yang Maha Perkasa, Yang Maha Kuasa, Yang Memiliki segala Keagungan, Maha Suci Allah dari apa yang mereka persekutukan
 Dialah Allah Yang Menciptakan, Yang Mengadakan, Yang Membentuk Rupa, Yang Mempunyai Asmaaul Husna. Bertasbih kepada-Nya apa yang di langit dan bumi. Dan Dialah Yang Maha Perkasa lagi Maha Bijaksana`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-hasyr-13-sore",
@@ -391,7 +418,8 @@ Dialah Allah Yang Menciptakan, Yang Mengadakan, Yang Membentuk Rupa, Yang Mempun
 Dialah Allah Yang tiada Tuhan selain Dia, Raja, Yang Maha Suci, Yang Maha Sejahtera, Yang Mengaruniakan Keamanan, Yang Maha Memelihara, Yang Maha Perkasa, Yang Maha Kuasa, Yang Memiliki segala Keagungan, Maha Suci Allah dari apa yang mereka persekutukan
 Dialah Allah Yang Menciptakan, Yang Mengadakan, Yang Membentuk Rupa, Yang Mempunyai Asmaaul Husna. Bertasbih kepada-Nya apa yang di langit dan bumi. Dan Dialah Yang Maha Perkasa lagi Maha Bijaksana`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "az-zalzalah-14-pagi",
@@ -415,7 +443,8 @@ Pada hari itu manusia ke luar dari kuburnya dalam keadaan bermacam-macam, supaya
 Barangsiapa yang mengerjakan kebaikan seberat dzarrahpun, niscaya dia akan melihat (balasan)nya
 Dan barangsiapa yang mengerjakan kejahatan sebesar dzarrahpun, niscaya dia akan melihat (balasan)nya pula`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "az-zalzalah-14-sore",
@@ -439,7 +468,8 @@ Pada hari itu manusia ke luar dari kuburnya dalam keadaan bermacam-macam, supaya
 Barangsiapa yang mengerjakan kebaikan seberat dzarrahpun, niscaya dia akan melihat (balasan)nya
 Dan barangsiapa yang mengerjakan kejahatan sebesar dzarrahpun, niscaya dia akan melihat (balasan)nya pula`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-kafirun-15-pagi",
@@ -459,7 +489,8 @@ Dan aku tidak pernah menjadi penyembah apa yang kamu sembah
 Dan kamu tidak pernah (pula) menjadi penyembah Tuhan yang aku sembah
 Untukmu agamamu, dan untukkulah, agamaku"`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-kafirun-15-sore",
@@ -479,7 +510,8 @@ Dan aku tidak pernah menjadi penyembah apa yang kamu sembah
 Dan kamu tidak pernah (pula) menjadi penyembah Tuhan yang aku sembah
 Untukmu agamamu, dan untukkulah, agamaku"`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "an-nashr-16-pagi",
@@ -493,7 +525,8 @@ Untukmu agamamu, dan untukkulah, agamaku"`,
 Dan kamu lihat manusia masuk agama Allah dengan berbondong-bondong
 Maka bertasbihlah dengan memuji Tuhanmu dan mohonlah ampun kepada-Nya. Sesungguhnya Dia adalah Maha Penerima taubat`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "an-nashr-16-sore",
@@ -507,7 +540,8 @@ Maka bertasbihlah dengan memuji Tuhanmu dan mohonlah ampun kepada-Nya. Sesungguh
 Dan kamu lihat manusia masuk agama Allah dengan berbondong-bondong
 Maka bertasbihlah dengan memuji Tuhanmu dan mohonlah ampun kepada-Nya. Sesungguhnya Dia adalah Maha Penerima taubat`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-ikhlas-17-pagi",
@@ -523,7 +557,8 @@ Allah adalah Tuhan yang bergantung kepada-Nya segala sesuatu
 Dia tiada beranak dan tidak pula diperanakkan
 Dan tidak ada seorangpun yang setara dengan Dia`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-ikhlas-17-sore",
@@ -539,7 +574,8 @@ Allah adalah Tuhan yang bergantung kepada-Nya segala sesuatu
 Dia tiada beranak dan tidak pula diperanakkan
 Dan tidak ada seorangpun yang setara dengan Dia`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "al-falaq-18-pagi",
@@ -557,7 +593,8 @@ Dan dari kejahatan malam apabila telah gelap gulita
 Dan dari kejahatan wanita-wanita tukang sihir yang menghembus pada buhul-buhul
 Dan dari kejahatan pendengki bila ia dengki`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "al-falaq-18-sore",
@@ -575,7 +612,8 @@ Dan dari kejahatan malam apabila telah gelap gulita
 Dan dari kejahatan wanita-wanita tukang sihir yang menghembus pada buhul-buhul
 Dan dari kejahatan pendengki bila ia dengki`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "an-naas-19-pagi",
@@ -595,7 +633,8 @@ Dari kejahatan (bisikan) setan yang biasa bersembunyi
 Yang membisikkan (kejahatan) ke dalam dada manusia
 Dari (golongan) jin dan manusia`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "an-naas-19-sore",
@@ -615,7 +654,8 @@ Dari kejahatan (bisikan) setan yang biasa bersembunyi
 Yang membisikkan (kejahatan) ke dalam dada manusia
 Dari (golongan) jin dan manusia`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-20-pagi",
@@ -624,7 +664,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَصْبَحْنَا وَأَصْبَحَ (أَمْسَيْنَا وَأَمْسَى) الْمُلْكُ لِلّهَِ وَالْحَمْدُ لِلّهَِ لاَ شَرِيكَ لَهُ، لاَ إِلهَ إِلَّا هُوَ وَإِلَيْهِ النُّشُوْرُ (الْمَصِيْرُ)`,
     translation: `Kami berpagi hari (bersore hari) dan berpagi hari (bersore hari) pula kerjaan milik Allah. Segala puji bagi Allah, tiada sekutu bagi-Nya, tiada Tuhan melainkan Dia dan kepada-Nya tempat kembali.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-20-sore",
@@ -633,7 +674,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَصْبَحْنَا وَأَصْبَحَ (أَمْسَيْنَا وَأَمْسَى) الْمُلْكُ لِلّهَِ وَالْحَمْدُ لِلّهَِ لاَ شَرِيكَ لَهُ، لاَ إِلهَ إِلَّا هُوَ وَإِلَيْهِ النُّشُوْرُ (الْمَصِيْرُ)`,
     translation: `Kami berpagi hari (bersore hari) dan berpagi hari (bersore hari) pula kerjaan milik Allah. Segala puji bagi Allah, tiada sekutu bagi-Nya, tiada Tuhan melainkan Dia dan kepada-Nya tempat kembali.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-21-pagi",
@@ -642,7 +684,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَصْبَحْنَا (أَمْسَيْنَا) عَلَى فِطْرَةِ اْلإِسْلاَمِ وَعَلَى كَلِمَةِ اْلإِخْلاَصِ وَعَلَى دِيْنِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ وَعَلَى مِلَّةِ أَبِيْنَا إِبْرَاهِيْمَ حَنِيْفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِيْنَ`,
     translation: `Di waktu pagi (sore) kami memegang agama Islam, kalimat ikhlas, agama Nabi kita Muhammad shallallahu ‘alaihi wa sallam, dan agama ayah kami Ibrahim, yang berdiri di atas jalan yang lurus, muslim dan tidak tergolong orang-orang musyrik.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-21-sore",
@@ -651,7 +694,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَصْبَحْنَا (أَمْسَيْنَا) عَلَى فِطْرَةِ اْلإِسْلاَمِ وَعَلَى كَلِمَةِ اْلإِخْلاَصِ وَعَلَى دِيْنِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ وَعَلَى مِلَّةِ أَبِيْنَا إِبْرَاهِيْمَ حَنِيْفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِيْنَ`,
     translation: `Di waktu pagi (sore) kami memegang agama Islam, kalimat ikhlas, agama Nabi kita Muhammad shallallahu ‘alaihi wa sallam, dan agama ayah kami Ibrahim, yang berdiri di atas jalan yang lurus, muslim dan tidak tergolong orang-orang musyrik.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-22-pagi",
@@ -660,7 +704,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اللَّهُمَّ إِنِّي أَصْبَحْتُ (أَمْسَيتُ) مِنْكَ فِي نِعْمَةٍ وَعَافِيَةٍ وَسِتْر فَأَتِمَّ عَلَيَّ نِعْمَتَكَ وَعَافِيَتَكَ وَسِتْرَكَ فِي الدُّنْيَا وَالآخِرَة`,
     translation: `Ya Allah, sesungguhnya aku berpagi hari (bersore hari) dari-Mu dalam kenikmatan, kesehatan dan perlindungan. Maka sempurnakannlah untukku kenikmatan, kesehatan dan perlindungan-Mu itu di dunia dan akhirat.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-22-sore",
@@ -669,7 +714,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اللَّهُمَّ إِنِّي أَصْبَحْتُ (أَمْسَيتُ) مِنْكَ فِي نِعْمَةٍ وَعَافِيَةٍ وَسِتْر فَأَتِمَّ عَلَيَّ نِعْمَتَكَ وَعَافِيَتَكَ وَسِتْرَكَ فِي الدُّنْيَا وَالآخِرَة`,
     translation: `Ya Allah, sesungguhnya aku berpagi hari (bersore hari) dari-Mu dalam kenikmatan, kesehatan dan perlindungan. Maka sempurnakannlah untukku kenikmatan, kesehatan dan perlindungan-Mu itu di dunia dan akhirat.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-23-pagi",
@@ -678,7 +724,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اللَّهُمَّ مَا أَصْبَحَ (أَمْسَ) بِيْ مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيْكَ لَكَ فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ`,
     translation: `Ya Allah, kenikmatan yang aku atau salah seorang dari makhluk-Mu berpagi hari (bersore hari) dengannya adalah dari-Mu semata; tiada sekutu bagi-Mu. Maka bagi-Mu segala puji dan rasa syukur.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-23-sore",
@@ -687,7 +734,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اللَّهُمَّ مَا أَصْبَحَ (أَمْسَ) بِيْ مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيْكَ لَكَ فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ`,
     translation: `Ya Allah, kenikmatan yang aku atau salah seorang dari makhluk-Mu berpagi hari (bersore hari) dengannya adalah dari-Mu semata; tiada sekutu bagi-Mu. Maka bagi-Mu segala puji dan rasa syukur.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-24-pagi",
@@ -696,7 +744,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `يَا رَبِّي لَكَ الْحَمْدُ كَمَا يَنْبَغِي لِجَلَالِ وَجْهِكَ وَلِعَظِيمِ سُلْطَانِكَ`,
     translation: `Ya Tuhanku, Segala puji bagiMu sebagaimana seyogyanya kemuliaan wajahMu dan keagungan kekuasaanMu.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-24-sore",
@@ -705,7 +754,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `يَا رَبِّي لَكَ الْحَمْدُ كَمَا يَنْبَغِي لِجَلَالِ وَجْهِكَ وَلِعَظِيمِ سُلْطَانِكَ`,
     translation: `Ya Tuhanku, Segala puji bagiMu sebagaimana seyogyanya kemuliaan wajahMu dan keagungan kekuasaanMu.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-25-pagi",
@@ -714,7 +764,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `رَضِيتُ بِاللَّهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ نَبِيًّا وَرَسُولًا`,
     translation: `Aku ridha Allah sebagai Rabb, Islam sebagai agama, dan Muhammad sebagai Rasul.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-25-sore",
@@ -723,7 +774,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `رَضِيتُ بِاللَّهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ نَبِيًّا وَرَسُولًا`,
     translation: `Aku ridha Allah sebagai Rabb, Islam sebagai agama, dan Muhammad sebagai Rasul.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-26-pagi",
@@ -732,7 +784,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ وَرِضَا نَفْسِهِ وَزِنَةَ عَرْشِهِ وَمِدَادَ كَلِمَاتِهِ`,
     translation: `Maha Suci Allah dan Segala Puji bagiNya, sebanyak bilangan makhlukNya, seridha diriNya, setimbangan ‘arsy-Nya, dan sebanyak tinta dari kata-kataNya.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-26-sore",
@@ -741,7 +794,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ وَرِضَا نَفْسِهِ وَزِنَةَ عَرْشِهِ وَمِدَادَ كَلِمَاتِهِ`,
     translation: `Maha Suci Allah dan Segala Puji bagiNya, sebanyak bilangan makhlukNya, seridha diriNya, setimbangan ‘arsy-Nya, dan sebanyak tinta dari kata-kataNya.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-27-pagi",
@@ -750,7 +804,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ`,
     translation: `Dengan nama Allah Yang bersama NamaNya sesuatu apa pun tidak akan celaka baik di bumi dan di langit. Dialah Maha Medengar lagi maha Mengetahui.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-27-sore",
@@ -759,7 +814,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ`,
     translation: `Dengan nama Allah Yang bersama NamaNya sesuatu apa pun tidak akan celaka baik di bumi dan di langit. Dialah Maha Medengar lagi maha Mengetahui.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-28-pagi",
@@ -768,7 +824,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اللَّهُمَّ إِنَّا نَعُوذُ بِكَ مِنْ أَنْ نُشْرِكَ بِكَ شَيْئًا نَعْلَمُهُ وَنَسْتَغْفِرُكَ لِمَا لَا نَعْلَمُه`,
     translation: `Ya Allah sesungguhnya kami berlindung kepadaMu dari menyekutukanMu dengan sesuatu yang kami ketahui, dan kami memohon ampunanMu dari apa-apa yang tidak kami ketahui.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-28-sore",
@@ -777,7 +834,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اللَّهُمَّ إِنَّا نَعُوذُ بِكَ مِنْ أَنْ نُشْرِكَ بِكَ شَيْئًا نَعْلَمُهُ وَنَسْتَغْفِرُكَ لِمَا لَا نَعْلَمُه`,
     translation: `Ya Allah sesungguhnya kami berlindung kepadaMu dari menyekutukanMu dengan sesuatu yang kami ketahui, dan kami memohon ampunanMu dari apa-apa yang tidak kami ketahui.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-29-pagi",
@@ -786,7 +844,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ`,
     translation: `Aku berlindung dengan kalimat Allah yang sempurna dari keburukan apa-apa yang Dia ciptakan.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-29-sore",
@@ -795,7 +854,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ`,
     translation: `Aku berlindung dengan kalimat Allah yang sempurna dari keburukan apa-apa yang Dia ciptakan.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-30-pagi",
@@ -804,7 +864,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنَ الهَمِّ وَالْحَزَنِ وَأَعُوْذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ وَأَعُوْذُ بِكَ مِنَ الْجُبْنِ وَالبُخْلِ وَأَعُوْذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ`,
     translation: `Ya Allah, aku berlindung kepada-Mu dari rasa gelisah dan sedih, dari kelemahan dan kemalasan, dari sifat pengecut dan bakhil, dan dari lilitan hutang dan kesewenang-wenangan orang.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-30-sore",
@@ -813,7 +874,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنَ الهَمِّ وَالْحَزَنِ وَأَعُوْذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ وَأَعُوْذُ بِكَ مِنَ الْجُبْنِ وَالبُخْلِ وَأَعُوْذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ`,
     translation: `Ya Allah, aku berlindung kepada-Mu dari rasa gelisah dan sedih, dari kelemahan dan kemalasan, dari sifat pengecut dan bakhil, dan dari lilitan hutang dan kesewenang-wenangan orang.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-31-pagi",
@@ -822,7 +884,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللَّهُمَّ عَافِنِي فِي بَدَنِي اَللَّهُمَّ عَافِنِي فِي سَمْعِي اَللَّهُمَّ عَافِنِي فِي بَصَرِي`,
     translation: `Ya Allah berikanlah kesehatan bagi badanku, bagi pendengaranku, bagi penglihatanku.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-31-sore",
@@ -831,7 +894,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللَّهُمَّ عَافِنِي فِي بَدَنِي اَللَّهُمَّ عَافِنِي فِي سَمْعِي اَللَّهُمَّ عَافِنِي فِي بَصَرِي`,
     translation: `Ya Allah berikanlah kesehatan bagi badanku, bagi pendengaranku, bagi penglihatanku.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-32-pagi",
@@ -840,7 +904,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِوَأَعُوْذُ بِكَ مِنْ عَذَابِ الْقَبْرِلاَ إِلهَ إِلاَّ أَنْتَ`,
     translation: `Ya Allah sungguh aku berlindung kepadaMu dari kekufuran dan kefaqiran, Ya Allah sungguh aku berlindung kepadaMu dari azab kubur, tidak ada Ilah kecuali Engkau.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-32-sore",
@@ -849,7 +914,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللَّهُمَّ إِنِّي أَعُوْذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِوَأَعُوْذُ بِكَ مِنْ عَذَابِ الْقَبْرِلاَ إِلهَ إِلاَّ أَنْتَ`,
     translation: `Ya Allah sungguh aku berlindung kepadaMu dari kekufuran dan kefaqiran, Ya Allah sungguh aku berlindung kepadaMu dari azab kubur, tidak ada Ilah kecuali Engkau.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-33-pagi",
@@ -858,7 +924,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللّهُمَّ أَنْتَ رَبِّي لَا إلهَ إِلاَّ أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ أَعُوْذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ أَبُوْءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوْءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوْبَ إِلاَّ أَنْتَ`,
     translation: `Ya Allah, Engkau Tuhanku, tiada Tuhan kecuali Engkau. Engkau ciptakan aku dan aku adalah hamba-Mu. Aku berada di atas janjiMu, semampuku. Aku berlindung kepadaMu dari keburukan perbuatanku. Aku mengakui banyaknya nikmat (yang Engkau anugerahkan) kepadaku dan aku mengakui dosa-dosaku, maka ampunilah aku. Karena sesungguhnya tiada yang mengampuni dosa-dosa melainkan Engkau`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-33-sore",
@@ -867,7 +934,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللّهُمَّ أَنْتَ رَبِّي لَا إلهَ إِلاَّ أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ أَعُوْذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ أَبُوْءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوْءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوْبَ إِلاَّ أَنْتَ`,
     translation: `Ya Allah, Engkau Tuhanku, tiada Tuhan kecuali Engkau. Engkau ciptakan aku dan aku adalah hamba-Mu. Aku berada di atas janjiMu, semampuku. Aku berlindung kepadaMu dari keburukan perbuatanku. Aku mengakui banyaknya nikmat (yang Engkau anugerahkan) kepadaku dan aku mengakui dosa-dosaku, maka ampunilah aku. Karena sesungguhnya tiada yang mengampuni dosa-dosa melainkan Engkau`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-34-pagi",
@@ -876,7 +944,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إلهَ إِلَّا هُوَ الْحَيَّ الْقَيُّومَ وَأَتُوبُ إِلَيْهِ`,
     translation: `Aku memohon ampunan Allah Yang Tiada Tuhan melainkan Dia, Yang Maha Hidup dan Maha Mengurus (makhluk-Nya).`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-34-sore",
@@ -885,7 +954,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إلهَ إِلَّا هُوَ الْحَيَّ الْقَيُّومَ وَأَتُوبُ إِلَيْهِ`,
     translation: `Aku memohon ampunan Allah Yang Tiada Tuhan melainkan Dia, Yang Maha Hidup dan Maha Mengurus (makhluk-Nya).`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-35-pagi",
@@ -894,7 +964,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا صَلَّــيْتَ عَـلَى سَيِّدِنَا إِبْرَاهِيْمَ وَعَلَى آلِ سَيِّدِنَا إِبْـرَاهِيْمَ وبَارِكْ عَـلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا بَارَكْتَ عَـلَى سَيِّدِنَا إِبْرَاهِيْمَ وَعَــلَى آلِ سَيـِّدِنَا إِبْـرَاهِيْمَ فِي الْعَالَمِيْنَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ`,
     translation: `Ya Allah berikanlah shalawat kepada Nabi Muhammad dan keluarga Nabi Muhammad, sebagaimana telah Engkau berikan kepada Nabi Ibrahim dan keluarga Nabi Ibrahim. Berikanlah barakah kepada Nabi Muhammad dan keluarga Nabi Muhammad, sebagaimana telah Engkau berikan kepada Nabi Ibrahim dan keluarga Nabi Ibrahim. Di alam Engkaulah Yang Maha Terpuji lagi Maha Mulia.`,
     repeat: 10,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-35-sore",
@@ -903,7 +974,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `اَللّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا صَلَّــيْتَ عَـلَى سَيِّدِنَا إِبْرَاهِيْمَ وَعَلَى آلِ سَيِّدِنَا إِبْـرَاهِيْمَ وبَارِكْ عَـلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا بَارَكْتَ عَـلَى سَيِّدِنَا إِبْرَاهِيْمَ وَعَــلَى آلِ سَيـِّدِنَا إِبْـرَاهِيْمَ فِي الْعَالَمِيْنَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ`,
     translation: `Ya Allah berikanlah shalawat kepada Nabi Muhammad dan keluarga Nabi Muhammad, sebagaimana telah Engkau berikan kepada Nabi Ibrahim dan keluarga Nabi Ibrahim. Berikanlah barakah kepada Nabi Muhammad dan keluarga Nabi Muhammad, sebagaimana telah Engkau berikan kepada Nabi Ibrahim dan keluarga Nabi Ibrahim. Di alam Engkaulah Yang Maha Terpuji lagi Maha Mulia.`,
     repeat: 10,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-36-pagi",
@@ -912,7 +984,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ`,
     translation: `Maha Suci Allah, segala puji bagi Allah, tiada Tuhan melainkan Allah dan Allah Maha Besar.`,
     repeat: 100,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-36-sore",
@@ -921,27 +994,30 @@ Dari (golongan) jin dan manusia`,
     arabic: `سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ`,
     translation: `Maha Suci Allah, segala puji bagi Allah, tiada Tuhan melainkan Allah dan Allah Maha Besar.`,
     repeat: 100,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-37-pagi",
     title: "Do'a Al-Matsurat",
     time: "pagi",
-    arabic: `لاَ إلهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيْكَ لَهُ ، لَهُ الْمُلْكُ   
+    arabic: `لاَ إلهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيْكَ لَهُ ، لَهُ الْمُلْكُ
  وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيْرٌ`,
     translation: `Tiada Tuhan melainkan Allah semata, yang tiada sekutu bagi-Nya, bagi-Nya kerajaan dan bagi-Nya segala puji, dan Dia berkuasa ata segala sesuatu.`,
     repeat: 10,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-37-sore",
     title: "Do'a Al-Matsurat",
     time: "sore",
-    arabic: `لاَ إلهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيْكَ لَهُ ، لَهُ الْمُلْكُ   
+    arabic: `لاَ إلهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيْكَ لَهُ ، لَهُ الْمُلْكُ
  وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيْرٌ`,
     translation: `Tiada Tuhan melainkan Allah semata, yang tiada sekutu bagi-Nya, bagi-Nya kerajaan dan bagi-Nya segala puji, dan Dia berkuasa ata segala sesuatu.`,
     repeat: 10,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-38-pagi",
@@ -950,7 +1026,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَّا إلهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوْبُ إِلَيْكَ`,
     translation: `Maha suci Engkau ya Allah, dan segala puji bagi-Mu. Aku bersaksi bahwa tiada Tuhan melainkan Engkau, aku memohon ampunan dan bertaubat kepada-Mu`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-38-sore",
@@ -959,7 +1036,8 @@ Dari (golongan) jin dan manusia`,
     arabic: `سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَّا إلهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوْبُ إِلَيْكَ`,
     translation: `Maha suci Engkau ya Allah, dan segala puji bagi-Mu. Aku bersaksi bahwa tiada Tuhan melainkan Engkau, aku memohon ampunan dan bertaubat kepada-Mu`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-al-matsurat-39-pagi",
@@ -967,11 +1045,12 @@ Dari (golongan) jin dan manusia`,
     time: "pagi",
     arabic: `اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ عَبْدِكَ وَرَسُوْلِكَ النَّبِيِّ الأُمِّيِّ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ تَسْلِيْمًا عَدَدَ مَا أَحَاطَ بِهِ عِلْمُكَ وَخَطَّ بِهِ قَلَمُكَ وَأَحْصَاهُ كِتَابُكَ، وَارْضَ اللَّهُمَّ عَنْ سَادَاتِنَا أَبِيْ بَكْرٍ وَعُمَرَ وَعُثْمَانَ وَعَلِيْ، وَعَنِ الصَّحَابَةِ أَجْمَعِيْنَ، وَعَنِ التَّابِعِيْنَ وَتَابِعِيْهِمْ بِإِحْسَانٍ إِلَى يَوْمِ الدِّيْن
 سُبْحَانَ رَبِّك رَبِّ العِزَّةِ عَمَّا يَصِفُوْنَ، وَسَلَامٌ عَلَى المُرْسَلِيْنَ، وَالحَمْدُ لِلَّهِ رَبِّ العَالَمِيْنَ`,
-    translation: `Ya Allah berikanlah shalawat kepada Nabi Muhammad; hamba-Mu, nabi-Mu, dan Rasul-Mu; Nabi yang ummi. Juga kepada keluarga dan para sahabatnya serta berilah keselamatan sebanyak yang terjangkau oleh ilmu-Mu yang tergores oleh pena-Mu, dan yang terangkum oleh kitab-Mu. Ridhailah ya Allah para pemimpin kami, Abu Bakar, Umar, Utsman, dan Ali, semua sahabat, semua tabi’in dan orang-orang yang mengikuti mereka sampai hari pembalasan. 
+    translation: `Ya Allah berikanlah shalawat kepada Nabi Muhammad; hamba-Mu, nabi-Mu, dan Rasul-Mu; Nabi yang ummi. Juga kepada keluarga dan para sahabatnya serta berilah keselamatan sebanyak yang terjangkau oleh ilmu-Mu yang tergores oleh pena-Mu, dan yang terangkum oleh kitab-Mu. Ridhailah ya Allah para pemimpin kami, Abu Bakar, Umar, Utsman, dan Ali, semua sahabat, semua tabi’in dan orang-orang yang mengikuti mereka sampai hari pembalasan.
 
 Maha suci Tuhanmu; Tuhan kemuliaan, dari apa-apa yang mereka sifatkan. Keselamatan semoga tercurah kepada para utusan dan segala puji bagi Allah, Tuhan semesta alam.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-al-matsurat-39-sore",
@@ -979,11 +1058,12 @@ Maha suci Tuhanmu; Tuhan kemuliaan, dari apa-apa yang mereka sifatkan. Keselamat
     time: "sore",
     arabic: `اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ عَبْدِكَ وَرَسُوْلِكَ النَّبِيِّ الأُمِّيِّ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ تَسْلِيْمًا عَدَدَ مَا أَحَاطَ بِهِ عِلْمُكَ وَخَطَّ بِهِ قَلَمُكَ وَأَحْصَاهُ كِتَابُكَ، وَارْضَ اللَّهُمَّ عَنْ سَادَاتِنَا أَبِيْ بَكْرٍ وَعُمَرَ وَعُثْمَانَ وَعَلِيْ، وَعَنِ الصَّحَابَةِ أَجْمَعِيْنَ، وَعَنِ التَّابِعِيْنَ وَتَابِعِيْهِمْ بِإِحْسَانٍ إِلَى يَوْمِ الدِّيْن
 سُبْحَانَ رَبِّك رَبِّ العِزَّةِ عَمَّا يَصِفُوْنَ، وَسَلَامٌ عَلَى المُرْسَلِيْنَ، وَالحَمْدُ لِلَّهِ رَبِّ العَالَمِيْنَ`,
-    translation: `Ya Allah berikanlah shalawat kepada Nabi Muhammad; hamba-Mu, nabi-Mu, dan Rasul-Mu; Nabi yang ummi. Juga kepada keluarga dan para sahabatnya serta berilah keselamatan sebanyak yang terjangkau oleh ilmu-Mu yang tergores oleh pena-Mu, dan yang terangkum oleh kitab-Mu. Ridhailah ya Allah para pemimpin kami, Abu Bakar, Umar, Utsman, dan Ali, semua sahabat, semua tabi’in dan orang-orang yang mengikuti mereka sampai hari pembalasan. 
+    translation: `Ya Allah berikanlah shalawat kepada Nabi Muhammad; hamba-Mu, nabi-Mu, dan Rasul-Mu; Nabi yang ummi. Juga kepada keluarga dan para sahabatnya serta berilah keselamatan sebanyak yang terjangkau oleh ilmu-Mu yang tergores oleh pena-Mu, dan yang terangkum oleh kitab-Mu. Ridhailah ya Allah para pemimpin kami, Abu Bakar, Umar, Utsman, dan Ali, semua sahabat, semua tabi’in dan orang-orang yang mengikuti mereka sampai hari pembalasan.
 
 Maha suci Tuhanmu; Tuhan kemuliaan, dari apa-apa yang mereka sifatkan. Keselamatan semoga tercurah kepada para utusan dan segala puji bagi Allah, Tuhan semesta alam.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "ali-imran-40-pagi",
@@ -994,7 +1074,8 @@ Maha suci Tuhanmu; Tuhan kemuliaan, dari apa-apa yang mereka sifatkan. Keselamat
     translation: `Katakanlah: "Wahai Tuhan Yang mempunyai kerajaan, Engkau berikan kerajaan kepada orang yang Engkau kehendaki dan Engkau cabut kerajaan dari orang yang Engkau kehendaki. Engkau muliakan orang yang Engkau kehendaki dan Engkau hinakan orang yang Engkau kehendaki. Di tangan Engkaulah segala kebajikan.Sesungguhnya Engkau Maha Kuasa atas segala sesuatu.
 Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau beri rezeki siapa yang Engkau kehendaki tanpa hisab (batas)`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "ali-imran-40-sore",
@@ -1005,50 +1086,55 @@ Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. E
     translation: `Katakanlah: "Wahai Tuhan Yang mempunyai kerajaan, Engkau berikan kerajaan kepada orang yang Engkau kehendaki dan Engkau cabut kerajaan dari orang yang Engkau kehendaki. Engkau muliakan orang yang Engkau kehendaki dan Engkau hinakan orang yang Engkau kehendaki. Di tangan Engkaulah segala kebajikan.Sesungguhnya Engkau Maha Kuasa atas segala sesuatu.
 Engkau masukkan malam ke dalam siang dan Engkau masukkan siang ke dalam malam. Engkau keluarkan yang hidup dari yang mati, dan Engkau keluarkan yang mati dari yang hidup. Dan Engkau beri rezeki siapa yang Engkau kehendaki tanpa hisab (batas)`,
     repeat: 1,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-robithoh-41-pagi",
     title: "Do'a Robithoh",
     time: "pagi",
-    arabic: `اَللَّهُمَّ إِنَّ هَذَا إِقْبَالُ نَهَارِكَ (لَيْلِكَ) وَإِدْبَارُ لَيْلِكَ (نَهَارِكَ) وَأَصْوَاتُ دُعَاتِكَ فَاغْفِرْلِي`,
-    translation: `Ya Allah, sesungguhnya ini adalah siang-Mu (malam-Mu) yang telah menjelang dan (malam-Mu) siang-Mu yang tengah berlalu serta suara-suara penyeru-Mu, maka ampunilah aku.`,
+    arabic: `اَللَّهُمَّ إِنَّ هَذَا إِقْبَالُ نَهَارِكَ وَإِدْبَارُ لَيْلِكَ وَأَصْوَاتُ دُعَاتِكَ فَاغْفِرْلِي`,
+    translation: `Ya Allah, sesungguhnya ini adalah datangnya siang-Mu, perginya malam-Mu, dan suara-suara para penyeru-Mu; maka ampunilah aku.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-robithoh-41-sore",
     title: "Do'a Robithoh",
     time: "sore",
-    arabic: `اَللَّهُمَّ إِنَّ هَذَا إِقْبَالُ نَهَارِكَ (لَيْلِكَ) وَإِدْبَارُ لَيْلِكَ (نَهَارِكَ) وَأَصْوَاتُ دُعَاتِكَ فَاغْفِرْلِي`,
-    translation: `Ya Allah, sesungguhnya ini adalah siang-Mu (malam-Mu) yang telah menjelang dan (malam-Mu) siang-Mu yang tengah berlalu serta suara-suara penyeru-Mu, maka ampunilah aku.`,
+    arabic: `اَللَّهُمَّ إِنَّ هَذَا إِقْبَالُ لَيْلِكَ وَإِدْبَارُ نَهَارِكَ وَأَصْوَاتُ دُعَاتِكَ فَاغْفِرْلِي`,
+    translation: `Ya Allah, sesungguhnya ini adalah datangnya malam-Mu, perginya siang-Mu, dan suara-suara para penyeru-Mu; maka ampunilah aku.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
   {
     id: "do-a-robithoh-42-pagi",
     title: "Do'a Robithoh",
     time: "pagi",
-    arabic: `اَللّهُمَّ إِنَّكَ تَعْلَمُ أَنَّ هَذِهِ الْقُلُوْبَ، قَدِ اجْتَمَعَتْ عَلَى مَحَبَّتِكَ وَالْتَقَتْ عَلَى طَاعَتِكَ، وَتَوَحَّدَتْ عَلَى دَعْوَتِكَ وَتَعَاهَدَتْ عَلَى نُصْرَةِ شَرِيْعَتِكَ فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا، وَأَدِمْ وُدَّهَا، وَاهْدِهَا سُبُلَهَا وَامْلَأَهَا بِنُوْرِكَ الَّذِيْ لاَ يَخْبُوْا وَاشْرَحْ صُدُوْرَهَا بِفَيْضِ الْإِيْمَانِ بِكَ، وَجَمِيْلِ التَّوَكُّلِ عَلَيْكَ وَاَحْيِهَا بِمَعْرِفَتِكَ، وَأَمِتْهَا عَلَى الشَّهَادَةِ فِي سَبِيْلِكَ إِنَّكَ نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيْرِ. اَللَّهُمَّ أَمِيْنَ. 
+    arabic: `اَللّهُمَّ إِنَّكَ تَعْلَمُ أَنَّ هَذِهِ الْقُلُوْبَ، قَدِ اجْتَمَعَتْ عَلَى مَحَبَّتِكَ وَالْتَقَتْ عَلَى طَاعَتِكَ، وَتَوَحَّدَتْ عَلَى دَعْوَتِكَ وَتَعَاهَدَتْ عَلَى نُصْرَةِ شَرِيْعَتِكَ فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا، وَأَدِمْ وُدَّهَا، وَاهْدِهَا سُبُلَهَا وَامْلَأَهَا بِنُوْرِكَ الَّذِيْ لاَ يَخْبُوْا وَاشْرَحْ صُدُوْرَهَا بِفَيْضِ الْإِيْمَانِ بِكَ، وَجَمِيْلِ التَّوَكُّلِ عَلَيْكَ وَاَحْيِهَا بِمَعْرِفَتِكَ، وَأَمِتْهَا عَلَى الشَّهَادَةِ فِي سَبِيْلِكَ إِنَّكَ نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيْرِ. اَللَّهُمَّ أَمِيْنَ.
 
 وَصَلِّ اللَّهُمَّ عَلَى سَيِّدَنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمَ.`,
-    translation: `Ya Allah, sesungguhnya Engkau Maha Mengetahui bahawa hati-hati ini, telah berhimpun di atas dasar kecintaan terhadapmu, bertemu di atas ketaatan kepada-Mu dan bersatu bagi memikul beban dakwah-Mu, hati-hati ini telah mengikat persetiaan untuk menolong meninggikan syariat-Mu. Oleh itu, Ya Allah, Engkau perkukuhkan ikatannya dan Engkau kekalkan kemesraan hati-hati ini, tunjukilah hati-hati ini akan jalan yang sebenar,  serta penuhkanlah (piala) hati-hati ini dengan cahaya Rabbani-Mu yang tidak kunjung redup, lapangkanlah hati-hati dengan limpahan keimanan serta keindahan tawakkal kepada-Mu, hidup suburkanlah hati-hati ini dengan makrifat (pengenalan yang sebenarnya) tentang-Mu.  (Jika Engkau takdirkan kami mati) maka matikanlah hati-hati ini sebagai para syuhada dalam perjuangan agama-Mu. Sesungguhnya Engkau sebaik-baik pelindung dan sebaik-baik penolong.  Ya Allah perkenankanlah doa kami. 
+    translation: `Ya Allah, sesungguhnya Engkau Maha Mengetahui bahawa hati-hati ini, telah berhimpun di atas dasar kecintaan terhadapmu, bertemu di atas ketaatan kepada-Mu dan bersatu bagi memikul beban dakwah-Mu, hati-hati ini telah mengikat persetiaan untuk menolong meninggikan syariat-Mu. Oleh itu, Ya Allah, Engkau perkukuhkan ikatannya dan Engkau kekalkan kemesraan hati-hati ini, tunjukilah hati-hati ini akan jalan yang sebenar,  serta penuhkanlah (piala) hati-hati ini dengan cahaya Rabbani-Mu yang tidak kunjung redup, lapangkanlah hati-hati dengan limpahan keimanan serta keindahan tawakkal kepada-Mu, hidup suburkanlah hati-hati ini dengan makrifat (pengenalan yang sebenarnya) tentang-Mu.  (Jika Engkau takdirkan kami mati) maka matikanlah hati-hati ini sebagai para syuhada dalam perjuangan agama-Mu. Sesungguhnya Engkau sebaik-baik pelindung dan sebaik-baik penolong.  Ya Allah perkenankanlah doa kami.
 
 Dan semoga shalawat serta salam selalu tercurah kepada Nabi Muhammad, keluarganya dan kepada semua sahabatnya.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Pagi.mp3",
   },
   {
     id: "do-a-robithoh-42-sore",
     title: "Do'a Robithoh",
     time: "sore",
-    arabic: `اَللّهُمَّ إِنَّكَ تَعْلَمُ أَنَّ هَذِهِ الْقُلُوْبَ، قَدِ اجْتَمَعَتْ عَلَى مَحَبَّتِكَ وَالْتَقَتْ عَلَى طَاعَتِكَ، وَتَوَحَّدَتْ عَلَى دَعْوَتِكَ وَتَعَاهَدَتْ عَلَى نُصْرَةِ شَرِيْعَتِكَ فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا، وَأَدِمْ وُدَّهَا، وَاهْدِهَا سُبُلَهَا وَامْلَأَهَا بِنُوْرِكَ الَّذِيْ لاَ يَخْبُوْا وَاشْرَحْ صُدُوْرَهَا بِفَيْضِ الْإِيْمَانِ بِكَ، وَجَمِيْلِ التَّوَكُّلِ عَلَيْكَ وَاَحْيِهَا بِمَعْرِفَتِكَ، وَأَمِتْهَا عَلَى الشَّهَادَةِ فِي سَبِيْلِكَ إِنَّكَ نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيْرِ. اَللَّهُمَّ أَمِيْنَ. 
+    arabic: `اَللّهُمَّ إِنَّكَ تَعْلَمُ أَنَّ هَذِهِ الْقُلُوْبَ، قَدِ اجْتَمَعَتْ عَلَى مَحَبَّتِكَ وَالْتَقَتْ عَلَى طَاعَتِكَ، وَتَوَحَّدَتْ عَلَى دَعْوَتِكَ وَتَعَاهَدَتْ عَلَى نُصْرَةِ شَرِيْعَتِكَ فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا، وَأَدِمْ وُدَّهَا، وَاهْدِهَا سُبُلَهَا وَامْلَأَهَا بِنُوْرِكَ الَّذِيْ لاَ يَخْبُوْا وَاشْرَحْ صُدُوْرَهَا بِفَيْضِ الْإِيْمَانِ بِكَ، وَجَمِيْلِ التَّوَكُّلِ عَلَيْكَ وَاَحْيِهَا بِمَعْرِفَتِكَ، وَأَمِتْهَا عَلَى الشَّهَادَةِ فِي سَبِيْلِكَ إِنَّكَ نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيْرِ. اَللَّهُمَّ أَمِيْنَ.
 
 وَصَلِّ اللَّهُمَّ عَلَى سَيِّدَنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمَ.`,
-    translation: `Ya Allah, sesungguhnya Engkau Maha Mengetahui bahawa hati-hati ini, telah berhimpun di atas dasar kecintaan terhadapmu, bertemu di atas ketaatan kepada-Mu dan bersatu bagi memikul beban dakwah-Mu, hati-hati ini telah mengikat persetiaan untuk menolong meninggikan syariat-Mu. Oleh itu, Ya Allah, Engkau perkukuhkan ikatannya dan Engkau kekalkan kemesraan hati-hati ini, tunjukilah hati-hati ini akan jalan yang sebenar,  serta penuhkanlah (piala) hati-hati ini dengan cahaya Rabbani-Mu yang tidak kunjung redup, lapangkanlah hati-hati dengan limpahan keimanan serta keindahan tawakkal kepada-Mu, hidup suburkanlah hati-hati ini dengan makrifat (pengenalan yang sebenarnya) tentang-Mu.  (Jika Engkau takdirkan kami mati) maka matikanlah hati-hati ini sebagai para syuhada dalam perjuangan agama-Mu. Sesungguhnya Engkau sebaik-baik pelindung dan sebaik-baik penolong.  Ya Allah perkenankanlah doa kami. 
+    translation: `Ya Allah, sesungguhnya Engkau Maha Mengetahui bahawa hati-hati ini, telah berhimpun di atas dasar kecintaan terhadapmu, bertemu di atas ketaatan kepada-Mu dan bersatu bagi memikul beban dakwah-Mu, hati-hati ini telah mengikat persetiaan untuk menolong meninggikan syariat-Mu. Oleh itu, Ya Allah, Engkau perkukuhkan ikatannya dan Engkau kekalkan kemesraan hati-hati ini, tunjukilah hati-hati ini akan jalan yang sebenar,  serta penuhkanlah (piala) hati-hati ini dengan cahaya Rabbani-Mu yang tidak kunjung redup, lapangkanlah hati-hati dengan limpahan keimanan serta keindahan tawakkal kepada-Mu, hidup suburkanlah hati-hati ini dengan makrifat (pengenalan yang sebenarnya) tentang-Mu.  (Jika Engkau takdirkan kami mati) maka matikanlah hati-hati ini sebagai para syuhada dalam perjuangan agama-Mu. Sesungguhnya Engkau sebaik-baik pelindung dan sebaik-baik penolong.  Ya Allah perkenankanlah doa kami.
 
 Dan semoga shalawat serta salam selalu tercurah kepada Nabi Muhammad, keluarganya dan kepada semua sahabatnya.`,
     repeat: 3,
-    audioUrl: "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
+    audioUrl:
+      "https://archive.org/download/al-matsurat-kubro-shugro-pagi-dan-petang/Al%20Matsurat%20Kubro%20Petang.mp3",
   },
 ];
