@@ -23,6 +23,12 @@ import { primeAudioPlayback } from "../lib/audioUnlock";
 import { juzMeta, type JuzMeta } from "../data/juzMeta";
 import type { SurahItem } from "../lib/types";
 
+const QURANCOM_API_BASE = "https://api.quran.com/api/v4";
+const QURAN_AUDIO_ORIGIN = "https://audio.qurancdn.com";
+const QURANCOM_AUDIO_RECITER = 7;
+const QURANCOM_PER_PAGE = 200;
+const MAX_QURANCOM_PAGES = 120;
+
 const resolveAudioUrl = (value: unknown): string | null => {
   if (typeof value === "string" && value.trim()) return value;
   if (!value) return null;
@@ -48,14 +54,36 @@ const resolveAudioUrl = (value: unknown): string | null => {
   return null;
 };
 
+const canUseProxyAudioRoute = () => {
+  if (API_BASE_URL.startsWith("/")) return true;
+  if (typeof window === "undefined") return false;
+  try {
+    const parsed = new URL(API_BASE_URL, window.location.origin);
+    return parsed.origin === window.location.origin;
+  } catch {
+    return false;
+  }
+};
+
 const proxyAudioUrl = (url: string | null) => {
   if (!url) return null;
   if (url.startsWith("blob:")) return url;
   if (url.startsWith("/api/") || url.startsWith(`${API_BASE_URL}/`)) {
     return url;
   }
+  if (!canUseProxyAudioRoute()) return url;
   const base = API_BASE_URL.replace(/\/$/, "");
   return `${base}/audio?url=${encodeURIComponent(url)}`;
+};
+
+const resolveQuranCdnUrl = (value: string) => {
+  if (!value) return value;
+  try {
+    return new URL(value).toString();
+  } catch {
+    const cleaned = value.replace(/^\/+/, "");
+    return `${QURAN_AUDIO_ORIGIN}/${cleaned}`;
+  }
 };
 
 const getSurahAudio = (item: SurahItem) =>
@@ -295,20 +323,83 @@ const MurratalPage = () => {
 
   const fetchJuzAudio = useCallback(
     async (juz: number) => {
-      const result = await fetchJson<
-        { surah_number: number; ayah_number: number; audio_url: string }[]
-      >(`/quran/juz/${juz}/audio`);
-      const list = Array.isArray(result.data) ? result.data : [];
-      return list
-        .filter((item) => item.audio_url)
-        .map((item) =>
-          buildJuzTrack({
-            juz,
-            surahNumber: item.surah_number,
-            ayahNumber: item.ayah_number,
-            audioUrl: item.audio_url,
-          }),
-        );
+      try {
+        const result = await fetchJson<
+          { surah_number: number; ayah_number: number; audio_url: string }[]
+        >(`/quran/juz/${juz}/audio`);
+        const list = Array.isArray(result.data) ? result.data : [];
+        const proxied = list
+          .filter((item) => item.audio_url)
+          .map((item) =>
+            buildJuzTrack({
+              juz,
+              surahNumber: item.surah_number,
+              ayahNumber: item.ayah_number,
+              audioUrl: proxyAudioUrl(item.audio_url) ?? item.audio_url,
+            }),
+          );
+        if (proxied.length > 0) {
+          return proxied;
+        }
+      } catch {
+        // Fallback handled below
+      }
+
+      const directTracks: AudioTrack[] = [];
+      for (let page = 1; page <= MAX_QURANCOM_PAGES; page += 1) {
+        const url = new URL(`${QURANCOM_API_BASE}/verses/by_juz/${juz}`);
+        url.searchParams.set("audio", String(QURANCOM_AUDIO_RECITER));
+        url.searchParams.set("per_page", String(QURANCOM_PER_PAGE));
+        url.searchParams.set("page", String(page));
+        const response = await fetch(url.toString(), {
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) {
+          throw new Error("Gagal mengambil audio juz.");
+        }
+        const payload = (await response.json()) as {
+          verses?: Array<{
+            verse_key?: string;
+            verse_number?: number;
+            audio?: { url?: string | null };
+          }>;
+          pagination?: { total_pages?: number };
+        };
+        const verses = Array.isArray(payload?.verses) ? payload.verses : [];
+        verses.forEach((item) => {
+          const verseKey = item.verse_key ?? "";
+          const [surahRaw, ayahRaw] = verseKey.split(":");
+          const surahNumber = Number(surahRaw);
+          const ayahNumber =
+            Number(ayahRaw) ||
+            (typeof item.verse_number === "number" ? item.verse_number : 0);
+          const audioPath = item.audio?.url ?? "";
+          if (
+            !Number.isFinite(surahNumber) ||
+            !Number.isFinite(ayahNumber) ||
+            !audioPath
+          ) {
+            return;
+          }
+          const directUrl = resolveQuranCdnUrl(audioPath);
+          directTracks.push(
+            buildJuzTrack({
+              juz,
+              surahNumber,
+              ayahNumber,
+              audioUrl: proxyAudioUrl(directUrl) ?? directUrl,
+            }),
+          );
+        });
+
+        const totalPages =
+          typeof payload?.pagination?.total_pages === "number"
+            ? payload.pagination.total_pages
+            : page;
+        if (page >= totalPages) break;
+      }
+
+      return directTracks;
     },
     [buildJuzTrack],
   );

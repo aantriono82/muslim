@@ -36,6 +36,30 @@ const normalizeSegmentTime = (value?: number) => {
   if (value < 0) return 0;
   return value;
 };
+const NON_CORS_AUDIO_HOSTS = new Set(["cdn.myquran.com"]);
+
+const decodeProxyAudioTarget = (value: string) => {
+  if (!value || typeof window === "undefined") return null;
+  try {
+    const parsed = new URL(value, window.location.origin);
+    if (!parsed.pathname.endsWith("/audio")) return null;
+    const raw = parsed.searchParams.get("url");
+    if (!raw) return null;
+    return raw;
+  } catch {
+    return null;
+  }
+};
+
+const canUseWebAudioForSrc = (value: string) => {
+  if (!value || typeof window === "undefined") return true;
+  try {
+    const parsed = new URL(value, window.location.origin);
+    return !NON_CORS_AUDIO_HOSTS.has(parsed.hostname.toLowerCase());
+  } catch {
+    return true;
+  }
+};
 
 const EQ_PRESETS = {
   Flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -117,8 +141,14 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
   const SLEEP_KEY = "ibadahmu:audio:sleep";
   const AUTOPLAY_KEY = "ibadahmu:audio:autoplay";
   const [showQueue, setShowQueue] = useState(false);
+  const [fallbackSrc, setFallbackSrc] = useState<string | null>(null);
 
   const resolvedSrc = typeof track?.src === "string" ? track.src : "";
+  const activeSrc = fallbackSrc ?? resolvedSrc;
+  const canUseWebAudio = useMemo(
+    () => canUseWebAudioForSrc(activeSrc),
+    [activeSrc],
+  );
   const prefetchSrc = useMemo(() => {
     if (!queue.length) return "";
     const nextIndex = currentIndex + 1;
@@ -141,8 +171,13 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     return value;
   }, [track?.segment?.endTime, segmentStart]);
 
+  useEffect(() => {
+    setFallbackSrc(null);
+  }, [resolvedSrc]);
+
   const initAudioContext = useCallback(() => {
     if (typeof window === "undefined") return null;
+    if (!canUseWebAudio) return null;
     if (audioContextRef.current && sourceRef.current)
       return audioContextRef.current;
     const audio = audioRef.current;
@@ -222,7 +257,7 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
       console.error("AudioContext initialization failed:", err);
       return null;
     }
-  }, [preamp]);
+  }, [canUseWebAudio, preamp]);
 
   const resumeAudioContext = useCallback(async () => {
     let ctx = audioContextRef.current;
@@ -289,10 +324,29 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     }
   }, [track, initAudioContext]);
 
+  useEffect(() => {
+    if (canUseWebAudio) return;
+    const ctx = audioContextRef.current;
+    if (!ctx) return;
+    ctx.close().catch(() => undefined);
+    audioContextRef.current = null;
+    sourceRef.current = null;
+    eqFiltersRef.current = [];
+    eqGainRef.current = null;
+    bypassGainRef.current = null;
+    masterGainRef.current = null;
+    analyserRef.current = null;
+    analyserDataRef.current = null;
+    timeDataRef.current = null;
+    limiterRef.current = null;
+    limiterGainRef.current = null;
+    limiterBypassRef.current = null;
+  }, [canUseWebAudio]);
+
   const streamInfo = useMemo(() => {
-    if (!track || !resolvedSrc)
+    if (!track || !activeSrc)
       return { format: "Unknown", sourceLabel: "Unknown", quality: "Default" };
-    const safeSrc = resolvedSrc;
+    const safeSrc = activeSrc;
     const formatSource = safeSrc.split("#")[0] ?? safeSrc;
     const format =
       track.format ??
@@ -312,13 +366,13 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
       sourceLabel,
       quality: track.quality ?? "Default",
     };
-  }, [track, resolvedSrc]);
+  }, [activeSrc, track]);
 
   useEffect(() => {
-    if (track && !resolvedSrc) {
+    if (track && !activeSrc) {
       setTrack(null);
     }
-  }, [track, resolvedSrc, setTrack]);
+  }, [activeSrc, track, setTrack]);
 
   useEffect(() => {
     eqBandsRef.current = eqBands;
@@ -537,11 +591,11 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
   };
 
   const savePosition = (time: number) => {
-    if (!track || !resolvedSrc) return;
+    if (!track || !activeSrc) return;
     try {
       window.localStorage.setItem(
         POSITION_KEY,
-        JSON.stringify({ src: resolvedSrc, time, updatedAt: Date.now() }),
+        JSON.stringify({ src: activeSrc, time, updatedAt: Date.now() }),
       );
     } catch {
       // ignore
@@ -666,7 +720,7 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
       setDuration(displayDuration);
       if (
         stored &&
-        stored.src === resolvedSrc &&
+        stored.src === activeSrc &&
         typeof stored.time === "number" &&
         stored.time > segmentStart + 5 &&
         rawDuration &&
@@ -692,11 +746,11 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     }
     audio.addEventListener("loadedmetadata", handleLoaded, { once: true });
     return () => audio.removeEventListener("loadedmetadata", handleLoaded);
-  }, [track, resolvedSrc, segmentEnd, segmentStart]);
+  }, [activeSrc, segmentEnd, segmentStart, track]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!prefetchSrc || prefetchSrc === resolvedSrc) return;
+    if (!prefetchSrc || prefetchSrc === activeSrc) return;
 
     const preloader = new Audio();
     preloader.preload = "auto";
@@ -706,7 +760,7 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     return () => {
       preloader.src = "";
     };
-  }, [prefetchSrc, resolvedSrc]);
+  }, [activeSrc, prefetchSrc]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -972,8 +1026,8 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
         ref={audioRef}
         className="sr-only"
         preload="auto"
-        src={resolvedSrc}
-        crossOrigin="anonymous"
+        src={activeSrc}
+        crossOrigin={canUseWebAudio ? "anonymous" : undefined}
         onPlay={() => {
           resumeAudioContext();
           setAutoplayBlocked(false);
@@ -998,6 +1052,20 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
         onError={(e) => {
           const target = e.target as HTMLAudioElement;
           console.error("Audio element error:", target.error);
+          if (fallbackSrc) return;
+          const directSrc = decodeProxyAudioTarget(resolvedSrc);
+          if (!directSrc || directSrc === resolvedSrc) return;
+          setFallbackSrc(directSrc);
+          window.setTimeout(() => {
+            const audio = audioRef.current;
+            if (!audio) return;
+            if (segmentStart > 0 && audio.currentTime < segmentStart) {
+              audio.currentTime = segmentStart;
+            }
+            playAudioSafely(audio, {
+              onBlocked: () => setAutoplayBlocked(true),
+            });
+          }, 50);
         }}
       />
 
