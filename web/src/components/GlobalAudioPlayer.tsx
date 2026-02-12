@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAudio } from "../lib/audio";
+import { hasRecentAudioPrime } from "../lib/audioUnlock";
 
 const EQ_LABELS = [
   "60",
@@ -239,7 +240,13 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
   }, [initAudioContext]);
 
   const playAudioSafely = useCallback(
-    (audio: HTMLAudioElement, options?: { onBlocked?: () => void }) => {
+    (
+      audio: HTMLAudioElement,
+      options?: {
+        onBlocked?: () => void;
+        skipPrimeRetry?: boolean;
+      },
+    ) => {
       const maybePromise = resumeAudioContext();
       const play = () => {
         const playPromise = audio.play();
@@ -250,8 +257,21 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
             if (err instanceof DOMException && err.name === "AbortError") {
               return;
             }
-            console.warn("Audio playback blocked or failed:", err);
-            options?.onBlocked?.();
+            const isAutoplayPolicyError =
+              err instanceof DOMException &&
+              (err.name === "NotAllowedError" || err.name === "SecurityError");
+            if (isAutoplayPolicyError) {
+              if (!options?.skipPrimeRetry && hasRecentAudioPrime()) {
+                window.setTimeout(() => {
+                  playAudioSafely(audio, { ...options, skipPrimeRetry: true });
+                }, 80);
+                return;
+              }
+              console.warn("Audio playback blocked by browser policy:", err);
+              options?.onBlocked?.();
+              return;
+            }
+            console.error("Audio playback failed:", err);
           });
       };
       if (maybePromise instanceof Promise) {

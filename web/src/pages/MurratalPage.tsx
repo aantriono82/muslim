@@ -19,6 +19,7 @@ import {
 } from "../components/State";
 import { API_BASE_URL, fetchJson, fetchJsonCached } from "../lib/api";
 import { useAudio, type AudioTrack } from "../lib/audio";
+import { primeAudioPlayback } from "../lib/audioUnlock";
 import { juzMeta, type JuzMeta } from "../data/juzMeta";
 import type { SurahItem } from "../lib/types";
 
@@ -265,6 +266,7 @@ const MurratalPage = () => {
     listOverride?: SurahItem[],
     groupJuz?: number,
   ) => {
+    primeAudioPlayback();
     const audioUrl = getSurahAudio(item);
     if (!audioUrl) return;
     juzAutoAdvanceRef.current.active = false;
@@ -279,6 +281,7 @@ const MurratalPage = () => {
   };
 
   const handleRandom = () => {
+    primeAudioPlayback();
     if (filteredWithAudio.length === 0) return;
     juzAutoAdvanceRef.current.active = false;
     const playlist = filteredWithAudio.map((entry) =>
@@ -312,6 +315,7 @@ const MurratalPage = () => {
 
   const handlePlayJuz = useCallback(
     async (juz: number) => {
+      primeAudioPlayback();
       juzAutoAdvanceRef.current = {
         active: true,
         lastAppended: juz,
