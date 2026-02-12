@@ -1,6 +1,6 @@
 # MuslimKit
 
-Repository ini berisi aplikasi MuslimKit dengan frontend web dan API proxy ke MyQuran.
+Repository ini berisi aplikasi MuslimKit (frontend web + API proxy) untuk kebutuhan ibadah harian.
 
 ## Preview
 
@@ -18,16 +18,21 @@ Lihat Full Tampilan di sini: [https://muslimkit.aantriono.com/](https://muslimki
 | --- | --- |
 | ![Preview MuslimKit mobile light](docs/preview/home-mobile-light.png) | ![Preview MuslimKit mobile dark](docs/preview/home-mobile-dark.png) |
 
-## Prasyarat
+## Dokumentasi
 
-- Bun terpasang
-- Node.js + npm terpasang
+- Dokumentasi lengkap: [`DOKUMENTASI_LENGKAP.md`](DOKUMENTASI_LENGKAP.md)
+- Frontend web: [`web/README.md`](web/README.md)
+- API proxy: [`apimuslim-proxy/README.md`](apimuslim-proxy/README.md)
+- API users (opsional): [`api/README.md`](api/README.md)
 
-## Menjalankan MuslimKit
+## Quick Start (Lokal)
 
-Jalankan dua service berikut di terminal terpisah.
+Prasyarat:
 
-1. Jalankan API proxy (`apimuslim-proxy`) di port `3000`:
+- Bun
+- Node.js + npm
+
+1. Jalankan API proxy (`apimuslim-proxy`) di port `3002`:
 
 ```bash
 cd /home/aantriono/Code/muslim/apimuslim-proxy
@@ -43,24 +48,30 @@ npm install
 npm run dev
 ```
 
-3. Buka aplikasi di browser:
+3. Buka aplikasi:
 
 ```txt
 http://localhost:5173
 ```
 
-## Catatan
+4. Opsional: jalankan API users terpisah (`http://localhost:4001/api`):
 
-- Frontend menggunakan proxy `/api` ke `http://localhost:3000`.
-- Folder `api` adalah service CRUD user terpisah dan tidak wajib untuk menjalankan MuslimKit utama.
-- Service `api` (users) berjalan di port `4001` secara default untuk menghindari konflik dengan proxy.
+```bash
+cd /home/aantriono/Code/muslim/api
+bun install
+bun run dev
+```
 
 ## Audit Menyeluruh
 
-Untuk menjalankan audit penuh lintas service (API, proxy, dan web termasuk visual test):
+Jalankan audit penuh lintas service:
 
 ```bash
 ./audit
 ```
 
-Command ini juga dipakai oleh GitHub Actions pada workflow `Audit CI` untuk setiap Pull Request.
+Audit ini dipakai juga oleh GitHub Actions (`Audit CI`) untuk PR/push.
+
+## Deploy
+
+Panduan deploy Cloudflare Pages ada di [`web/README.md`](web/README.md).

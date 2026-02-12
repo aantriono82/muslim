@@ -1,98 +1,47 @@
-# API Pengguna (Bun + Hono + SQLite)
+# API Users (Opsional)
 
-API sederhana untuk data pengguna dengan fitur CRUD dan list. Semua endpoint berada di bawah prefix `/api`.
+Service CRUD users berbasis Bun + Hono + SQLite.
 
-## Fitur
-- CRUD pengguna
-- List dengan pagination dan pencarian
-- SQLite otomatis dibuat saat aplikasi pertama kali dijalankan
+Catatan:
+- Service ini terpisah dari fitur utama MuslimKit.
+- Cocok untuk kebutuhan contoh backend CRUD / pengujian.
 
-## Prasyarat
-- Bun terpasang di mesin Anda
+## Menjalankan
 
-## Instalasi
 ```bash
 cd /home/aantriono/Code/muslim/api
 bun install
-```
-
-## Menjalankan Server
-```bash
 bun run dev
 ```
 
-Secara default server berjalan di `http://localhost:4001/api`.
+Default URL:
+- `http://localhost:4001/api`
 
-## Struktur Data Pengguna
-Field yang disimpan:
-- `id` (integer)
-- `name` (string)
-- `email` (string, unique)
-- `created_at` (string timestamp)
-- `updated_at` (string timestamp)
+## Script
 
-## Endpoint
+- `bun run dev` : jalankan mode watch
+- `bun run start` : jalankan sekali
+- `bun run typecheck` : TypeScript check
+- `bun test` : unit/integration test
 
-### List pengguna
-`GET /api/users`
-Query opsional:
-- `page` (default 1)
-- `limit` (default 20, max 100)
-- `q` (pencarian nama/email)
+## Endpoint Inti
 
-```bash
-curl -s "http://localhost:4001/api/users?page=1&limit=10&q=andi"
-```
+- `GET /api/`
+- `GET /api/users`
+- `GET /api/users/:id`
+- `POST /api/users`
+- `PUT /api/users/:id`
+- `PATCH /api/users/:id`
+- `DELETE /api/users/:id`
 
-### Detail pengguna
-`GET /api/users/:id`
+## Konfigurasi
 
-```bash
-curl -s "http://localhost:4001/api/users/1"
-```
+- `PORT` (default `4001`)
 
-### Tambah pengguna
-`POST /api/users`
-Body JSON:
-- `name` (wajib)
-- `email` (wajib)
+Database SQLite tersimpan di:
+- `api/data.sqlite`
 
-```bash
-curl -s -X POST "http://localhost:4001/api/users" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Andi","email":"andi@example.com"}'
-```
+## Referensi
 
-### Update pengguna (full)
-`PUT /api/users/:id`
-Body JSON:
-- `name` (wajib)
-- `email` (wajib)
-
-```bash
-curl -s -X PUT "http://localhost:4001/api/users/1" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Andi Update","email":"andi@example.com"}'
-```
-
-### Update pengguna (partial)
-`PATCH /api/users/:id`
-Body JSON (opsional):
-- `name`
-- `email`
-
-```bash
-curl -s -X PATCH "http://localhost:4001/api/users/1" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Andi Baru"}'
-```
-
-### Hapus pengguna
-`DELETE /api/users/:id`
-
-```bash
-curl -s -X DELETE "http://localhost:4001/api/users/1"
-```
-
-## Catatan Database
-File database akan dibuat otomatis di `api/data.sqlite`.
+Lihat dokumentasi menyeluruh di:
+- [`../DOKUMENTASI_LENGKAP.md`](../DOKUMENTASI_LENGKAP.md)

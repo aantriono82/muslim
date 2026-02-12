@@ -1,78 +1,61 @@
-# API Muslim Proxy (Bun + Hono)
+# API Muslim Proxy
 
-Project ini menggunakan `apimuslim.json` sebagai dokumentasi OpenAPI dan seluruh backend diproxy ke `https://api.myquran.com/v3/`.
-Tambahan: modul Doa Harian diproxy ke EQuran (`https://equran.id/api/doa`) agar tetap bisa digunakan.
+Proxy backend MuslimKit berbasis Bun + Hono.
 
-## Fitur
-- Proxy seluruh request ke API MyQuran
-- Dokumentasi Swagger UI (`/docs`)
-- OpenAPI JSON (`/openapi.json`)
-- Proxy audio (Quran.com & MyQuran) lewat endpoint `/api/audio`
+Fungsi utama:
+- Proxy request `/api/*` ke MyQuran (`/v3`).
+- Menyediakan endpoint Doa Harian (EQuran) yang sudah dinormalisasi.
+- Proxy audio Quran (termasuk guard host allow-list).
+- Dokumentasi OpenAPI dan Swagger UI.
 
-## Prasyarat
-- Bun terpasang
+## Menjalankan
 
-## Instalasi
 ```bash
 cd /home/aantriono/Code/muslim/apimuslim-proxy
 bun install
-```
-
-## Menjalankan Server
-```bash
 bun run dev
 ```
 
-Default server di `http://localhost:3000`.
+Default URL:
+- `http://localhost:3002`
 
-## Cara Pakai Proxy
-Semua request ke path `/api` akan diteruskan ke `https://api.myquran.com/v3` (prefix `/v3` tetap didukung).
+## Script
 
-Contoh:
-```bash
-curl -s "http://localhost:3000/api/health"
-```
+- `bun run dev` : jalankan mode watch
+- `bun run start` : jalankan sekali
+- `bun run typecheck` : TypeScript check
+- `bun test` : unit/integration test
 
-### Doa Harian (EQuran)
-Endpoint berikut diproxy ke EQuran dan dibentuk ulang agar konsisten:
-```bash
-GET  /api/doa/harian
-GET  /api/doa/harian/kategori/{id}
-GET  /api/doa/harian/{id}
-GET  /api/doa/harian/random
-POST /api/doa/harian/cari
-```
+## Endpoint Penting
 
-### Audio Quran (Proxy)
-Endpoint audio:
-```bash
-GET /api/quran/juz/{number}/audio
-GET /api/audio?url={encoded_audio_url}
-```
+- `GET /` status proxy
+- `GET /openapi.json`
+- `GET /docs`
+- `GET /api/doa/harian`
+- `GET /api/doa/harian/kategori/:id`
+- `POST /api/doa/harian/cari`
+- `GET /api/doa/harian/random`
+- `GET /api/doa/harian/:id`
+- `GET /api/quran/juz/:number/audio`
+- `GET /api/audio?url=...`
 
-`/api/quran/juz/{number}/audio` mengembalikan daftar ayat dengan `audio_url` yang sudah diproxy.
+Kompatibilitas prefix:
+- `/api/*` dan `/v3/*` aktif secara default.
 
-## Dokumentasi
-- Swagger UI: `http://localhost:3000/docs`
-- OpenAPI JSON: `http://localhost:3000/openapi.json`
+## Konfigurasi Utama
 
-## Konfigurasi Environment
-- `PORT` (default: 3000)
-- `TARGET_ORIGIN` (default: `https://api.myquran.com`)
-- `PROXY_PREFIX` (default: `/api`)
-- `ALT_PREFIX` (default: `/v3`, untuk kompatibilitas)
-- `UPSTREAM_PREFIX` (default: `/v3`)
-- `PUBLIC_BASE_URL` (opsional) untuk mengganti `servers` di `openapi.json`
-- `DOA_ORIGIN` (default: `https://equran.id`)
-- `DOA_BASE` (default: `/api/doa`)
-- `DOA_TTL` (default: `3600`) cache daftar doa (detik)
-- `MAX_DOA_KEYWORD_LENGTH` (default: `100`) batas keyword pencarian doa
-- `QURANCOM_AUDIO_RECITER` (default: `7`)
-- `QURAN_AUDIO_ORIGIN` (default: `https://audio.qurancdn.com`)
-- `AUDIO_ALLOWED_HOSTS` (default: `audio.qurancdn.com,cdn.myquran.com,api.myquran.com`)
-- `MAX_PROXY_PAGES` (default: `120`) batas maksimal iterasi pagination upstream
+- `PORT` (default `3002`)
+- `TARGET_ORIGIN` (default `https://api.myquran.com`)
+- `PROXY_PREFIX` (default `/api`)
+- `ALT_PREFIX` (default `/v3`)
+- `UPSTREAM_PREFIX` (default `/v3`)
+- `MUSLIM_ORIGIN` (default `https://muslim-api-three.vercel.app`)
+- `DOA_ORIGIN` (default `https://equran.id`)
+- `DOA_BASE` (default `/api/doa`)
+- `UPSTREAM_TIMEOUT_MS` (default `15000`)
+- `AUDIO_ALLOWED_HOSTS` (allow-list host audio)
 
-Contoh override base URL untuk docs:
-```bash
-PUBLIC_BASE_URL="http://localhost:3000" bun run dev
-```
+## Referensi
+
+Lihat dokumentasi menyeluruh di:
+- [`../DOKUMENTASI_LENGKAP.md`](../DOKUMENTASI_LENGKAP.md)
