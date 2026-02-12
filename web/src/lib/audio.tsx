@@ -61,6 +61,34 @@ const REPEAT_KEY = "ibadahmu:audio:repeat";
 const HISTORY_KEY = "ibadahmu:audio:history";
 const HISTORY_LIMIT = 12;
 const MODULE_LAST_KEY = "ibadahmu:audio:last-module";
+const BROKEN_AUDIO_PROXY_HOSTS = new Set(["api.myquran.com"]);
+
+const normalizeTrackSource = (src: string) => {
+  if (typeof window === "undefined") return src;
+  if (!src) return src;
+  try {
+    const parsed = new URL(src, window.location.origin);
+    const isAudioProxyPath = parsed.pathname.endsWith("/audio");
+    const rawTarget = parsed.searchParams.get("url");
+    if (
+      !isAudioProxyPath ||
+      !rawTarget ||
+      !BROKEN_AUDIO_PROXY_HOSTS.has(parsed.hostname.toLowerCase())
+    ) {
+      return src;
+    }
+    return rawTarget;
+  } catch {
+    return src;
+  }
+};
+
+const normalizeTrack = (item: AudioTrack): AudioTrack => {
+  if (typeof item?.src !== "string") return item;
+  const normalizedSrc = normalizeTrackSource(item.src);
+  if (normalizedSrc === item.src) return item;
+  return { ...item, src: normalizedSrc };
+};
 
 const readStoredBoolean = (key: string, fallback: boolean) => {
   if (typeof window === "undefined") return fallback;
@@ -92,13 +120,15 @@ const readStoredQueue = (key: string) => {
     if (!raw) return [] as AudioTrack[];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [] as AudioTrack[];
-    return parsed.filter(
-      (item) =>
-        item &&
-        typeof item === "object" &&
-        typeof item.title === "string" &&
-        typeof item.src === "string",
-    ) as AudioTrack[];
+    return parsed
+      .filter(
+        (item) =>
+          item &&
+          typeof item === "object" &&
+          typeof item.title === "string" &&
+          typeof item.src === "string",
+      )
+      .map((item) => normalizeTrack(item as AudioTrack));
   } catch {
     return [] as AudioTrack[];
   }
@@ -111,13 +141,15 @@ const readStoredHistory = (key: string) => {
     if (!raw) return [] as AudioTrack[];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [] as AudioTrack[];
-    return parsed.filter(
-      (item) =>
-        item &&
-        typeof item === "object" &&
-        typeof item.title === "string" &&
-        typeof item.src === "string",
-    ) as AudioTrack[];
+    return parsed
+      .filter(
+        (item) =>
+          item &&
+          typeof item === "object" &&
+          typeof item.title === "string" &&
+          typeof item.src === "string",
+      )
+      .map((item) => normalizeTrack(item as AudioTrack));
   } catch {
     return [] as AudioTrack[];
   }
@@ -140,7 +172,7 @@ const readStoredLastByModule = (key: string) => {
         typeof item.title === "string" &&
         typeof item.src === "string"
       ) {
-        cleaned[module] = item;
+        cleaned[module] = normalizeTrack(item);
       }
     });
     return cleaned;
@@ -195,14 +227,14 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       setCurrentIndex(0);
       return;
     }
-    setQueueState([nextTrack]);
+    setQueueState([normalizeTrack(nextTrack)]);
     setCurrentIndex(0);
     setLastAction("user");
   }, []);
 
   const setQueueByTrack = useCallback((nextTrack: AudioTrack) => {
     if (!nextTrack) return;
-    setQueueState([nextTrack]);
+    setQueueState([normalizeTrack(nextTrack)]);
     setCurrentIndex(0);
     setLastAction("user");
   }, []);
@@ -213,15 +245,19 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       setCurrentIndex(0);
       return;
     }
+    const normalizedTracks = tracks.map((item) => normalizeTrack(item));
     const safeIndex = Math.min(Math.max(startIndex, 0), tracks.length - 1);
-    setQueueState(tracks);
+    setQueueState(normalizedTracks);
     setCurrentIndex(safeIndex);
     setLastAction("user");
   }, []);
 
   const appendQueue = useCallback((tracks: AudioTrack[]) => {
     if (!tracks.length) return;
-    setQueueState((prev) => (prev.length ? [...prev, ...tracks] : tracks));
+    const normalizedTracks = tracks.map((item) => normalizeTrack(item));
+    setQueueState((prev) =>
+      prev.length ? [...prev, ...normalizedTracks] : normalizedTracks,
+    );
   }, []);
 
   const jumpTo = useCallback(
