@@ -577,8 +577,49 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
         // ignore seek errors
       }
     }
-    playAudioSafely(audio, { onBlocked: () => setAutoplayBlocked(true) });
+    playAudioSafely(audio, {
+      onBlocked: () => {
+        if (lastAction === "restore") {
+          // Session restore may hit browser autoplay policy; keep paused
+          // silently and wait for next user interaction.
+          setAutoplayBlocked(false);
+          return;
+        }
+        setAutoplayBlocked(true);
+      },
+    });
   }, [track, autoplayLast, lastAction, segmentStart]);
+
+  useEffect(() => {
+    if (!autoplayBlocked || !track) return;
+
+    const resumeAfterGesture = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (segmentStart > 0 && audio.currentTime < segmentStart) {
+        try {
+          audio.currentTime = segmentStart;
+        } catch {
+          // ignore seek errors
+        }
+      }
+      playAudioSafely(audio, { onBlocked: () => setAutoplayBlocked(true) });
+    };
+
+    window.addEventListener("pointerdown", resumeAfterGesture, {
+      once: true,
+      capture: true,
+    });
+    window.addEventListener("keydown", resumeAfterGesture, {
+      once: true,
+      capture: true,
+    });
+
+    return () => {
+      window.removeEventListener("pointerdown", resumeAfterGesture, true);
+      window.removeEventListener("keydown", resumeAfterGesture, true);
+    };
+  }, [autoplayBlocked, playAudioSafely, segmentStart, track]);
 
   useEffect(() => {
     if (!audioRef.current || !track) return;
@@ -1273,7 +1314,7 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
             onClick={handlePlayPause}
             className="mx-auto block bg-emerald-600 px-6 py-1 text-[10px] font-bold text-white shadow-lg animate-pulse"
           >
-            AUTOPLAY BLOCKED - CLICK TO PLAY
+            AUTOPLAY DIBLOKIR BROWSER - KLIK UNTUK PUTAR
           </button>
         </div>
       ) : null}
