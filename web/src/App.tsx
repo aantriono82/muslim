@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
 import MobileNav from "./components/MobileNav";
 import Footer from "./components/Footer";
 import OfflineBanner from "./components/OfflineBanner";
 import ApiStatusBanner from "./components/ApiStatusBanner";
+import BackToTopButton from "./components/BackToTopButton";
 import HomePage from "./pages/HomePage";
 import SholatPage from "./pages/SholatPage";
 import QuranPage from "./pages/QuranPage";
@@ -54,7 +55,6 @@ const scheduleIdleTask = (task: () => void) => {
 };
 
 const App = () => {
-  const location = useLocation();
   const prefetchRunningRef = useRef(false);
 
   useEffect(() => {
@@ -171,6 +171,7 @@ const App = () => {
           />
         </Routes>
       </main>
+      <BackToTopButton />
       <Footer />
       <MobileNav />
     </div>
