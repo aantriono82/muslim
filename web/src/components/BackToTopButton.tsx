@@ -88,41 +88,43 @@ const BackToTopButton = () => {
       onClick={handleBackToTop}
       aria-label="Kembali ke atas"
       title="Kembali ke atas"
-      className={`back-to-top-btn fixed right-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none lg:bottom-6 relative overflow-hidden ${
+      className={`back-to-top-btn fixed right-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none lg:bottom-6 overflow-hidden ${
         isVisible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-3 opacity-0"
       } ${bottomOffsetClass}`}
     >
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 48 48"
-        aria-hidden="true"
-      >
-        <circle
-          cx="24"
-          cy="24"
-          r={RING_RADIUS}
-          fill="none"
-          stroke="currentColor"
-          strokeOpacity="0.25"
-          strokeWidth="3"
-        />
-        <circle
-          cx="24"
-          cy="24"
-          r={RING_RADIUS}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray={RING_CIRCUMFERENCE}
-          strokeDashoffset={dashOffset}
-          transform="rotate(-90 24 24)"
-          style={{ transition: "stroke-dashoffset 120ms linear" }}
-        />
-      </svg>
-      <ArrowUp className="relative z-[1] h-5 w-5" />
+      <span className="relative inline-flex h-full w-full items-center justify-center">
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          viewBox="0 0 48 48"
+          aria-hidden="true"
+        >
+          <circle
+            cx="24"
+            cy="24"
+            r={RING_RADIUS}
+            fill="none"
+            stroke="currentColor"
+            strokeOpacity="0.25"
+            strokeWidth="3"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r={RING_RADIUS}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray={RING_CIRCUMFERENCE}
+            strokeDashoffset={dashOffset}
+            transform="rotate(-90 24 24)"
+            style={{ transition: "stroke-dashoffset 120ms linear" }}
+          />
+        </svg>
+        <ArrowUp className="relative z-[1] h-5 w-5" />
+      </span>
     </button>
   );
 };
