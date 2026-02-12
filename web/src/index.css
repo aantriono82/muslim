@@ -1563,6 +1563,31 @@ body {
     box-shadow: 0 12px 24px rgba(16, 24, 40, 0.16);
 }
 
+.back-to-top-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.back-to-top-ring-track,
+.back-to-top-ring-progress {
+    fill: none;
+    stroke-width: 3;
+}
+
+.back-to-top-ring-track {
+    stroke: rgba(17, 102, 70, 0.2);
+}
+
+.back-to-top-ring-progress {
+    stroke: #108965;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 120ms linear;
+}
+
 .back-to-top-btn:hover {
     background: #ecfdf3;
 }
@@ -1577,6 +1602,14 @@ body {
     background: rgba(18, 30, 43, 0.95);
     color: #86d9b1;
     box-shadow: 0 14px 28px rgba(2, 8, 16, 0.55);
+}
+
+:root[data-theme="dark"] .back-to-top-ring-track {
+    stroke: rgba(134, 217, 177, 0.28);
+}
+
+:root[data-theme="dark"] .back-to-top-ring-progress {
+    stroke: #86d9b1;
 }
 
 :root[data-theme="dark"] .back-to-top-btn:hover {
