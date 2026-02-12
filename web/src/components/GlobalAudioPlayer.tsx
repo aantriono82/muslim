@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAudio } from "../lib/audio";
-import { hasRecentAudioPrime } from "../lib/audioUnlock";
+import { hasRecentAudioPrime, primeAudioPlayback } from "../lib/audioUnlock";
 
 const EQ_LABELS = [
   "60",
@@ -259,7 +259,7 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     }
   }, [canUseWebAudio, preamp]);
 
-  const resumeAudioContext = useCallback(async () => {
+  const resumeAudioContext = useCallback(() => {
     let ctx = audioContextRef.current;
     if (!ctx) {
       ctx = initAudioContext();
@@ -267,7 +267,13 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     if (!ctx) return;
     if (ctx.state === "suspended") {
       try {
-        await ctx.resume();
+        const resumePromise = ctx.resume();
+        if (resumePromise && typeof resumePromise.catch === "function") {
+          resumePromise.catch((err) => {
+            console.warn("Failed to resume AudioContext:", err);
+          });
+        }
+        return resumePromise;
       } catch (err) {
         console.warn("Failed to resume AudioContext:", err);
       }
@@ -282,37 +288,38 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
         skipPrimeRetry?: boolean;
       },
     ) => {
-      const maybePromise = resumeAudioContext();
-      const play = () => {
+      resumeAudioContext();
+      const handlePlayError = (err: unknown) => {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
+        const isAutoplayPolicyError =
+          err instanceof DOMException &&
+          (err.name === "NotAllowedError" || err.name === "SecurityError");
+        if (isAutoplayPolicyError) {
+          if (!options?.skipPrimeRetry && hasRecentAudioPrime()) {
+            window.setTimeout(() => {
+              playAudioSafely(audio, { ...options, skipPrimeRetry: true });
+            }, 80);
+            return;
+          }
+          console.warn("Audio playback blocked by browser policy:", err);
+          options?.onBlocked?.();
+          return;
+        }
+        console.error("Audio playback failed:", err);
+      };
+      try {
         const playPromise = audio.play();
-        if (!playPromise || typeof playPromise.catch !== "function") return;
+        if (!playPromise || typeof playPromise.catch !== "function") {
+          setAutoplayBlocked(false);
+          return;
+        }
         playPromise
           .then(() => setAutoplayBlocked(false))
-          .catch((err: unknown) => {
-            if (err instanceof DOMException && err.name === "AbortError") {
-              return;
-            }
-            const isAutoplayPolicyError =
-              err instanceof DOMException &&
-              (err.name === "NotAllowedError" || err.name === "SecurityError");
-            if (isAutoplayPolicyError) {
-              if (!options?.skipPrimeRetry && hasRecentAudioPrime()) {
-                window.setTimeout(() => {
-                  playAudioSafely(audio, { ...options, skipPrimeRetry: true });
-                }, 80);
-                return;
-              }
-              console.warn("Audio playback blocked by browser policy:", err);
-              options?.onBlocked?.();
-              return;
-            }
-            console.error("Audio playback failed:", err);
-          });
-      };
-      if (maybePromise instanceof Promise) {
-        maybePromise.then(play);
-      } else {
-        play();
+          .catch(handlePlayError);
+      } catch (err) {
+        handlePlayError(err);
       }
     },
     [resumeAudioContext],
@@ -668,6 +675,7 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     if (!autoplayBlocked || !track) return;
 
     const resumeAfterGesture = () => {
+      primeAudioPlayback();
       const audio = audioRef.current;
       if (!audio) return;
       if (segmentStart > 0 && audio.currentTime < segmentStart) {
@@ -684,6 +692,14 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
       once: true,
       capture: true,
     });
+    window.addEventListener("touchstart", resumeAfterGesture, {
+      once: true,
+      capture: true,
+    });
+    window.addEventListener("click", resumeAfterGesture, {
+      once: true,
+      capture: true,
+    });
     window.addEventListener("keydown", resumeAfterGesture, {
       once: true,
       capture: true,
@@ -691,6 +707,8 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
 
     return () => {
       window.removeEventListener("pointerdown", resumeAfterGesture, true);
+      window.removeEventListener("touchstart", resumeAfterGesture, true);
+      window.removeEventListener("click", resumeAfterGesture, true);
       window.removeEventListener("keydown", resumeAfterGesture, true);
     };
   }, [autoplayBlocked, playAudioSafely, segmentStart, track]);
@@ -950,10 +968,10 @@ const GlobalAudioPlayer = ({ embedded = false }: GlobalAudioPlayerProps) => {
     const audio = audioRef.current;
     if (!audio) return;
     if (audio.paused) {
+      primeAudioPlayback();
       if (segmentStart > 0 && audio.currentTime < segmentStart) {
         audio.currentTime = segmentStart;
       }
-      resumeAudioContext();
       playAudioSafely(audio, { onBlocked: () => setAutoplayBlocked(true) });
     } else {
       audio.pause();
