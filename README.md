@@ -2,6 +2,22 @@
 
 Repository ini berisi aplikasi MuslimKit dengan frontend web dan API proxy ke MyQuran.
 
+## Preview
+
+Lihat Full Tampilan di sini: [https://muslimkit.aantriono.com/](https://muslimkit.aantriono.com/)
+
+### Desktop View
+
+| Mode Terang | Mode Gelap |
+| --- | --- |
+| ![Preview MuslimKit desktop light](docs/preview/home-desktop-light.png) | ![Preview MuslimKit desktop dark](docs/preview/home-desktop-dark.png) |
+
+### Mobile View
+
+| Mode Terang | Mode Gelap |
+| --- | --- |
+| ![Preview MuslimKit mobile light](docs/preview/home-mobile-light.png) | ![Preview MuslimKit mobile dark](docs/preview/home-mobile-dark.png) |
+
 ## Prasyarat
 
 - Bun terpasang
