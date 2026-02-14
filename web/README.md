@@ -42,21 +42,27 @@ bun run dev
 
 ## Deploy ke Cloudflare Pages
 
+Konfigurasi yang dipakai agar build stabil:
+
+- Root directory: `web`
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Production branch: `main`
+- Environment variable (opsional, jika ingin pakai install manual):
+  - `SKIP_DEPENDENCY_INSTALL=1`
+  - Build command jadi: `npm ci && npm run build`
+
+Catatan:
+
+- Hindari menaruh file `web/bun.lockb` aktif di branch deploy, karena Cloudflare
+  bisa memilih `bun install --frozen-lockfile` dan gagal pada image Bun lama.
+- Repository ini menyimpan lockfile Bun sebagai `web/bun.lockb.disabled` agar
+  Pages tetap memilih alur npm berdasarkan `package-lock.json`.
+
 ```bash
 cd /home/aantriono/Code/muslim/web
 export CF_PAGES_PROJECT="nama-project-pages"
 npm run deploy:cloudflare
-```
-
-Jika build Cloudflare gagal dengan pesan `bun install --frozen-lockfile`:
-
-```bash
-cd /home/aantriono/Code/muslim/web
-bun install
-cd /home/aantriono/Code/muslim
-git add web/bun.lockb
-git commit -m "chore(web): sync bun lockfile"
-git push
 ```
 
 ## Referensi

@@ -539,6 +539,25 @@ export CF_PAGES_PROJECT="nama-project"
 npm run deploy:cloudflare
 ```
 
+Konfigurasi dashboard Pages yang direkomendasikan:
+
+- Root directory: `web`
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Production branch: `main`
+
+Jika perlu install dependency manual:
+
+- Tambahkan environment variable: `SKIP_DEPENDENCY_INSTALL=1`
+- Ubah build command: `npm ci && npm run build`
+
+Catatan operasional:
+
+- Jangan gunakan `web/bun.lockb` aktif di branch deploy Pages, karena Pages bisa
+  auto memilih Bun install dengan mode frozen lockfile.
+- Lockfile Bun di repository disimpan sebagai `web/bun.lockb.disabled` untuk
+  menjaga alur deploy tetap konsisten via npm (`package-lock.json`).
+
 ## 17. Script Data dan Utility
 
 Di `web/scripts/`:
@@ -580,4 +599,3 @@ Di `web/scripts/`:
 - Proxy server: `apimuslim-proxy/src/index.ts`
 - Users API: `api/src/index.ts`, `api/src/users.ts`
 - Full audit script: `audit`
-
