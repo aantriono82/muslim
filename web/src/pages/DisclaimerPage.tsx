@@ -59,7 +59,8 @@ const DisclaimerPage = () => {
               Al-Qur'an dan banyak riwayat hadis. Sebagian riwayat dinilai
               sahih, sementara sebagian lain diperselisihkan atau dinilai lemah
               (daif) oleh sebagian ulama. Untuk kehati-hatian dalam pengamalan,
-              silakan merujuk penjelasan ustaz atau lembaga yang tepercaya.
+              silakan merujuk penjelasan ustadz/ustadzah atau lembaga yang
+              tepercaya.
             </p>
           </Card>
 
