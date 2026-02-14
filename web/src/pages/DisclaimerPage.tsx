@@ -53,6 +53,16 @@ const DisclaimerPage = () => {
               terpercaya dan mengikuti keputusan resmi pemerintah/ulama di
               wilayah masing-masing.
             </p>
+            <p className="mt-3 text-sm text-textSecondary">
+              Pengguna diimbau untuk memeriksa kembali doa-doa yang tercantum.
+              Bacaan Al-Ma'tsurat yang disusun oleh Imam Hasan al-Banna sebagian
+              besar bersumber dari ayat Al-Qur'an dan hadis-hadis sahih. Namun,
+              tidak semua dalil dalam Al-Ma'tsurat berderajat sahih. Terdapat
+              beberapa hadis yang dinilai lemah (daif), bahkan ada yang perlu
+              diteliti lebih lanjut kesahihannya menurut pandangan sebagian
+              ulama. Hal ini dikembalikan lagi kepada pengguna untuk
+              pengamalannya.
+            </p>
           </Card>
 
           <Card>
