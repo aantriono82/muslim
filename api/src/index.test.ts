@@ -28,4 +28,24 @@ describe("users api", () => {
     expect(payload.status).toBe(false);
     expect(payload.message).toBe("Pencarian maksimal 100 karakter.");
   });
+
+  it("rejects non-numeric user id format on id routes", async () => {
+    const cases = [
+      new Request("http://localhost/api/users/1abc"),
+      new Request("http://localhost/api/users/1abc", { method: "PUT" }),
+      new Request("http://localhost/api/users/1abc", { method: "PATCH" }),
+      new Request("http://localhost/api/users/1abc", { method: "DELETE" }),
+    ];
+
+    for (const request of cases) {
+      const response = await app.request(request);
+      expect(response.status).toBe(400);
+      const payload = (await response.json()) as {
+        status?: boolean;
+        message?: string;
+      };
+      expect(payload.status).toBe(false);
+      expect(payload.message).toBe("ID tidak valid.");
+    }
+  });
 });

@@ -31,7 +31,8 @@ const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const MAX_SEARCH_LENGTH = 100;
 
 const parseId = (value?: string) => {
-  const id = Number.parseInt(value ?? "", 10);
+  if (!value || !/^\d+$/.test(value)) return null;
+  const id = Number(value);
   return Number.isInteger(id) && id > 0 ? id : null;
 };
 

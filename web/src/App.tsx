@@ -23,6 +23,7 @@ import PuasaPage from "./pages/PuasaPage";
 import HajiPage from "./pages/HajiPage";
 import { fetchJsonCached } from "./lib/api";
 import { formatDateId, formatMonthId } from "./lib/date";
+import { shouldPersistPrefetchStamp } from "./lib/prefetch";
 
 const PREFETCH_STAMP_KEY = "ibadahmu:prefetch:v1:date";
 const LOCATION_STORAGE_KEY = "ibadahmu:location";
@@ -74,7 +75,6 @@ const App = () => {
       if (stamp === todayId) return;
 
       prefetchRunningRef.current = true;
-      window.localStorage.setItem(PREFETCH_STAMP_KEY, todayId);
 
       cancelIdle = scheduleIdleTask(async () => {
         if (cancelled) {
@@ -124,8 +124,14 @@ const App = () => {
           );
         }
 
-        await Promise.allSettled(tasks);
-        prefetchRunningRef.current = false;
+        try {
+          const results = await Promise.allSettled(tasks);
+          if (!cancelled && shouldPersistPrefetchStamp(results)) {
+            window.localStorage.setItem(PREFETCH_STAMP_KEY, todayId);
+          }
+        } finally {
+          prefetchRunningRef.current = false;
+        }
       });
     };
 
