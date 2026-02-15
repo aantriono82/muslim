@@ -54,6 +54,10 @@ Kompatibilitas prefix:
 - `DOA_BASE` (default `/api/doa`)
 - `UPSTREAM_TIMEOUT_MS` (default `15000`)
 - `AUDIO_ALLOWED_HOSTS` (allow-list host audio)
+- `READ_ONLY_MODE` (default `false`) set `true/1` untuk mematikan endpoint write
+- `MAX_BODY_BYTES` (default `262144`) batas body request method write
+- `WRITE_RATE_LIMIT_WINDOW_SECONDS` (default `60`) window rate limit write
+- `WRITE_RATE_LIMIT_MAX` (default `180`) maksimum request write per IP per window
 
 ## Referensi
 

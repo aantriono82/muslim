@@ -1,0 +1,35 @@
+[Unit]
+Description=MuslimKit Users API (Bun + Hono + SQLite)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=muslimkit
+Group=muslimkit
+WorkingDirectory=/opt/muslimkit/api
+EnvironmentFile=/etc/muslimkit/muslim-users-api.env
+ExecStart=/usr/bin/bun src/index.ts
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=027
+ReadWritePaths=/opt/muslimkit/api /var/backups/muslimkit/api /var/log/muslimkit
+
+[Install]
+WantedBy=multi-user.target

@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
+    "backup": "bun scripts/backup-db.ts",
+    "backup:verify": "bun scripts/verify-backups.ts",
+    "backup:prune": "bun scripts/prune-backups.ts",
+    "restore": "bun scripts/restore-db.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },

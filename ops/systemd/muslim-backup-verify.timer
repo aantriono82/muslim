@@ -1,0 +1,11 @@
+[Unit]
+Description=Run backup verification for MuslimKit
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=600
+Persistent=true
+Unit=muslim-backup-verify.service
+
+[Install]
+WantedBy=timers.target

@@ -24,6 +24,7 @@ Lihat Full Tampilan di sini: [https://muslimkit.aantriono.com/](https://muslimki
 - Frontend web: [`web/README.md`](web/README.md)
 - API proxy: [`apimuslim-proxy/README.md`](apimuslim-proxy/README.md)
 - API users (opsional): [`api/README.md`](api/README.md)
+- Hardening deployment & anti-ransomware: [`docs/security/DEPLOYMENT_HARDENING.md`](docs/security/DEPLOYMENT_HARDENING.md)
 
 ## Quick Start (Lokal)
 

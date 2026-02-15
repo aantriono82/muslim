@@ -1,0 +1,29 @@
+[Unit]
+Description=Sync MuslimKit encrypted backups to offsite storage
+After=network-online.target muslim-backup.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=muslimkit
+Group=muslimkit
+WorkingDirectory=/opt/muslimkit
+EnvironmentFile=/etc/muslimkit/backup-offsite.env
+ExecStart=/opt/muslimkit/ops/scripts/offsite-sync-backups.sh
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=027
+ReadWritePaths=/opt/muslimkit /var/backups/muslimkit/api /var/log/muslimkit

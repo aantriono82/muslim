@@ -1,0 +1,11 @@
+[Unit]
+Description=Run MuslimKit encrypted backup periodically
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=120
+Persistent=true
+Unit=muslim-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -54,6 +54,16 @@ const UPSTREAM_TIMEOUT_MS = toPositiveInt(
   process.env.UPSTREAM_TIMEOUT_MS,
   15000,
 );
+const READ_ONLY_MODE = /^(1|true|yes)$/i.test(
+  (process.env.READ_ONLY_MODE ?? "").trim(),
+);
+const MAX_BODY_BYTES = toPositiveInt(process.env.MAX_BODY_BYTES, 256 * 1024);
+const WRITE_RATE_LIMIT_WINDOW_MS =
+  toPositiveInt(process.env.WRITE_RATE_LIMIT_WINDOW_SECONDS, 60) * 1000;
+const WRITE_RATE_LIMIT_MAX = toPositiveInt(
+  process.env.WRITE_RATE_LIMIT_MAX,
+  180,
+);
 const normalizePrefix = (value: string) => {
   const withSlash = value.startsWith("/") ? value : `/${value}`;
   const trimmed = withSlash.replace(/\/+$/, "");
@@ -71,6 +81,14 @@ const PROXY_PREFIXES = Array.from(new Set([PRIMARY_PREFIX, ALT_PREFIX]));
 const MUSLIM_PREFIXES = PROXY_PREFIXES.map((prefix) => `${prefix}/muslim`);
 const PORT = toPositiveInt(process.env.PORT, 3002);
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL;
+const METHODS_WITH_BODY = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+type RateBucket = {
+  count: number;
+  resetAt: number;
+};
+
+const writeRateBuckets = new Map<string, RateBucket>();
 
 const fetchWithTimeout = async (
   input: RequestInfo | URL,
@@ -585,7 +603,27 @@ const fetchDoaDetail = async (id: string): Promise<DoaItem | null> => {
   return payload?.data ?? null;
 };
 
+const applySecurityHeaders = (c: Context) => {
+  c.header("x-content-type-options", "nosniff");
+  c.header("x-frame-options", "DENY");
+  c.header("referrer-policy", "no-referrer");
+  c.header("permissions-policy", "geolocation=(), microphone=(), camera=()");
+  c.header("x-permitted-cross-domain-policies", "none");
+};
+
+const getClientIp = (c: Context) => {
+  const forwardedFor = c.req.header("x-forwarded-for");
+  if (forwardedFor) {
+    const first = forwardedFor.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  const realIp = c.req.header("x-real-ip")?.trim();
+  if (realIp) return realIp;
+  return "unknown";
+};
+
 app.use("*", async (c, next) => {
+  applySecurityHeaders(c);
   c.header("access-control-allow-origin", "*");
   c.header("access-control-allow-headers", "Content-Type, Authorization");
   c.header(
@@ -595,6 +633,92 @@ app.use("*", async (c, next) => {
   if (c.req.method === "OPTIONS") {
     return c.body(null, 204);
   }
+  await next();
+});
+
+app.use("*", async (c, next) => {
+  if (!METHODS_WITH_BODY.has(c.req.method)) {
+    await next();
+    return;
+  }
+
+  const contentLengthHeader = c.req.header("content-length");
+  if (!contentLengthHeader) {
+    await next();
+    return;
+  }
+
+  const contentLength = Number.parseInt(contentLengthHeader, 10);
+  if (!Number.isFinite(contentLength) || contentLength < 0) {
+    return c.json(
+      { status: false, message: "Content-Length tidak valid." },
+      400,
+    );
+  }
+  if (contentLength > MAX_BODY_BYTES) {
+    return c.json(
+      {
+        status: false,
+        message: `Body request terlalu besar. Maksimal ${MAX_BODY_BYTES} bytes.`,
+      },
+      413,
+    );
+  }
+
+  await next();
+});
+
+app.use("*", async (c, next) => {
+  if (!METHODS_WITH_BODY.has(c.req.method)) {
+    await next();
+    return;
+  }
+
+  if (READ_ONLY_MODE) {
+    return c.json(
+      {
+        status: false,
+        message: "Proxy sedang mode read-only. Endpoint tulis dinonaktifkan.",
+      },
+      503,
+    );
+  }
+
+  const now = Date.now();
+  const key = `write:${getClientIp(c)}`;
+  const bucket = writeRateBuckets.get(key);
+
+  if (!bucket || bucket.resetAt <= now) {
+    writeRateBuckets.set(key, {
+      count: 1,
+      resetAt: now + WRITE_RATE_LIMIT_WINDOW_MS,
+    });
+    await next();
+    return;
+  }
+
+  if (bucket.count >= WRITE_RATE_LIMIT_MAX) {
+    const retryAfter = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+    c.header("retry-after", String(retryAfter));
+    return c.json(
+      {
+        status: false,
+        message: "Terlalu banyak request tulis. Coba lagi nanti.",
+      },
+      429,
+    );
+  }
+
+  bucket.count += 1;
+
+  if (writeRateBuckets.size > 4096) {
+    for (const [bucketKey, entry] of writeRateBuckets) {
+      if (entry.resetAt <= now) {
+        writeRateBuckets.delete(bucketKey);
+      }
+    }
+  }
+
   await next();
 });
 
@@ -615,6 +739,7 @@ const buildOpenApi = () => {
 
 app.onError((err, c) => {
   console.error(err);
+  applySecurityHeaders(c);
   return c.json({ status: false, message: "Terjadi kesalahan server." }, 500);
 });
 
@@ -622,6 +747,7 @@ app.get("/", (c) =>
   c.json({
     status: true,
     message: "Proxy API Muslim berjalan.",
+    readOnly: READ_ONLY_MODE,
     proxyPrefix: PRIMARY_PREFIX,
     proxyPrefixes: PROXY_PREFIXES,
     upstream: `${TARGET_ORIGIN}${UPSTREAM_PREFIX}`,
@@ -964,66 +1090,66 @@ PROXY_PREFIXES.forEach((prefix) => registerQuranAudioRoutes(prefix));
 
 const createProxyHandler =
   (prefix: string, origin: string, upstreamPrefix: string) =>
-    async (c: Context) => {
-      const url = new URL(c.req.raw.url);
-      const incomingPath = url.pathname;
-      const trimmedPath = incomingPath.startsWith(prefix)
-        ? incomingPath.slice(prefix.length)
-        : incomingPath;
-      const normalizedUpstream = upstreamPrefix === "/" ? "" : upstreamPrefix;
-      const targetPath = `${normalizedUpstream}${trimmedPath}`;
-      const targetUrl = new URL(targetPath + url.search, origin);
+  async (c: Context) => {
+    const url = new URL(c.req.raw.url);
+    const incomingPath = url.pathname;
+    const trimmedPath = incomingPath.startsWith(prefix)
+      ? incomingPath.slice(prefix.length)
+      : incomingPath;
+    const normalizedUpstream = upstreamPrefix === "/" ? "" : upstreamPrefix;
+    const targetPath = `${normalizedUpstream}${trimmedPath}`;
+    const targetUrl = new URL(targetPath + url.search, origin);
 
-      const headers = new Headers(c.req.raw.headers);
-      headers.delete("host");
-      headers.delete("content-length");
-      headers.delete("connection");
-      headers.delete("keep-alive");
-      headers.delete("proxy-authenticate");
-      headers.delete("proxy-authorization");
-      headers.delete("te");
-      headers.delete("trailer");
-      headers.delete("upgrade");
-      if (!headers.has("user-agent")) {
-        headers.set("user-agent", "Mozilla/5.0 (MuslimKit)");
-      }
-      if (!headers.has("accept")) {
-        headers.set("accept", "application/json");
-      }
+    const headers = new Headers(c.req.raw.headers);
+    headers.delete("host");
+    headers.delete("content-length");
+    headers.delete("connection");
+    headers.delete("keep-alive");
+    headers.delete("proxy-authenticate");
+    headers.delete("proxy-authorization");
+    headers.delete("te");
+    headers.delete("trailer");
+    headers.delete("upgrade");
+    if (!headers.has("user-agent")) {
+      headers.set("user-agent", "Mozilla/5.0 (MuslimKit)");
+    }
+    if (!headers.has("accept")) {
+      headers.set("accept", "application/json");
+    }
 
-      const method = c.req.method;
-      const body =
-        method === "GET" || method === "HEAD" ? undefined : c.req.raw.body;
+    const method = c.req.method;
+    const body =
+      method === "GET" || method === "HEAD" ? undefined : c.req.raw.body;
 
-      let upstreamResponse: Response;
-      try {
-        upstreamResponse = await fetchWithTimeout(targetUrl.toString(), {
-          method,
-          headers,
-          body,
-          redirect: "manual",
-        });
-      } catch (err) {
-        const failure = toUpstreamFailure(err);
-        return c.json(
-          { status: false, message: failure.message },
-          failure.status,
-        );
-      }
-
-      const responseHeaders = new Headers(upstreamResponse.headers);
-      responseHeaders.delete("content-encoding");
-      responseHeaders.delete("content-length");
-      responseHeaders.delete("transfer-encoding");
-      responseHeaders.set("x-proxy-target", origin);
-      responseHeaders.set("access-control-allow-origin", "*");
-
-      return new Response(upstreamResponse.body, {
-        status: upstreamResponse.status,
-        statusText: upstreamResponse.statusText,
-        headers: responseHeaders,
+    let upstreamResponse: Response;
+    try {
+      upstreamResponse = await fetchWithTimeout(targetUrl.toString(), {
+        method,
+        headers,
+        body,
+        redirect: "manual",
       });
-    };
+    } catch (err) {
+      const failure = toUpstreamFailure(err);
+      return c.json(
+        { status: false, message: failure.message },
+        failure.status,
+      );
+    }
+
+    const responseHeaders = new Headers(upstreamResponse.headers);
+    responseHeaders.delete("content-encoding");
+    responseHeaders.delete("content-length");
+    responseHeaders.delete("transfer-encoding");
+    responseHeaders.set("x-proxy-target", origin);
+    responseHeaders.set("access-control-allow-origin", "*");
+
+    return new Response(upstreamResponse.body, {
+      status: upstreamResponse.status,
+      statusText: upstreamResponse.statusText,
+      headers: responseHeaders,
+    });
+  };
 
 MUSLIM_PREFIXES.forEach((prefix) => {
   const handler = createProxyHandler(

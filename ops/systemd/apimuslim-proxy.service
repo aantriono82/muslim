@@ -1,0 +1,35 @@
+[Unit]
+Description=MuslimKit API Proxy (Bun + Hono)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=muslimkit
+Group=muslimkit
+WorkingDirectory=/opt/muslimkit/apimuslim-proxy
+EnvironmentFile=/etc/muslimkit/apimuslim-proxy.env
+ExecStart=/usr/bin/bun src/index.ts
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=027
+ReadWritePaths=/var/log/muslimkit
+
+[Install]
+WantedBy=multi-user.target
