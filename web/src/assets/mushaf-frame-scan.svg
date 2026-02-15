@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1800" role="img" aria-label="Ornamental mushaf frame">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5f6df"/>
+      <stop offset="100%" stop-color="#e8eed0"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#39a885"/>
+      <stop offset="100%" stop-color="#1f7d60"/>
+    </linearGradient>
+    <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d7efe8"/>
+      <stop offset="50%" stop-color="#f1fbf7"/>
+      <stop offset="100%" stop-color="#d7efe8"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0dc9c"/>
+      <stop offset="100%" stop-color="#b98e3a"/>
+    </linearGradient>
+    <linearGradient id="petalPink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff93b8"/>
+      <stop offset="100%" stop-color="#d64c87"/>
+    </linearGradient>
+
+    <pattern id="vine" width="30" height="30" patternUnits="userSpaceOnUse">
+      <rect width="30" height="30" fill="#dff2ea"/>
+      <circle cx="15" cy="15" r="4" fill="#38a383" opacity="0.5"/>
+      <circle cx="15" cy="15" r="1.8" fill="#f0d489"/>
+      <path d="M5 20c6-8 14-8 20 0" fill="none" stroke="#2f9a79" stroke-width="1" opacity="0.55"/>
+      <circle cx="7" cy="21" r="1.3" fill="#e76aa0"/>
+      <circle cx="23" cy="21" r="1.3" fill="#e76aa0"/>
+    </pattern>
+
+    <pattern id="diamondBand" width="18" height="18" patternUnits="userSpaceOnUse">
+      <rect width="18" height="18" fill="#f5e7bb"/>
+      <path d="M9 1L17 9L9 17L1 9Z" fill="#d24f32"/>
+      <path d="M9 4L14 9L9 14L4 9Z" fill="#f8f3de"/>
+      <path d="M9 6L12 9L9 12L6 9Z" fill="#2d9b78"/>
+    </pattern>
+
+    <g id="petalTop">
+      <path d="M0 0L8 13L16 0" fill="url(#petalPink)" stroke="#2f8f72" stroke-width="1"/>
+      <circle cx="8" cy="8" r="2" fill="#f4dfa3"/>
+    </g>
+
+    <g id="sideFlower">
+      <circle cx="0" cy="0" r="24" fill="#f0faf5" stroke="#2e9878" stroke-width="3"/>
+      <circle cx="0" cy="0" r="17" fill="#d7eee6" stroke="#b88d3b" stroke-width="2"/>
+      <circle cx="0" cy="0" r="10" fill="#f7f2dd" stroke="#2e9878" stroke-width="2"/>
+      <path d="M-13 0h26M0-13v26" stroke="#2e9878" stroke-width="2"/>
+      <circle cx="0" cy="0" r="3" fill="#e56a9f"/>
+    </g>
+  </defs>
+
+  <rect x="150" y="140" width="900" height="1520" rx="22" fill="url(#paper)" stroke="#2e9979" stroke-width="5"/>
+  <rect x="170" y="160" width="860" height="1480" rx="16" fill="none" stroke="url(#gold)" stroke-width="9"/>
+  <rect x="190" y="180" width="820" height="1440" rx="14" fill="url(#vine)" stroke="#2e9979" stroke-width="3"/>
+  <rect x="214" y="204" width="772" height="1392" rx="10" fill="none" stroke="url(#diamondBand)" stroke-width="16"/>
+  <rect x="236" y="226" width="728" height="1348" rx="9" fill="#f1f7e5" stroke="#2e9979" stroke-width="3"/>
+
+  <rect x="258" y="270" width="684" height="1260" rx="7" fill="#f6faee" stroke="url(#gold)" stroke-width="2.5"/>
+  <rect x="282" y="294" width="636" height="1212" rx="6" fill="url(#aqua)" stroke="#2e9979" stroke-width="2.2"/>
+
+  <rect x="314" y="360" width="572" height="1080" rx="5" fill="#fdfdf8" stroke="#b88d3b" stroke-width="2"/>
+
+  <rect x="292" y="230" width="616" height="98" rx="8" fill="url(#vine)" stroke="#2e9979" stroke-width="3"/>
+  <rect x="292" y="1470" width="616" height="98" rx="8" fill="url(#vine)" stroke="#2e9979" stroke-width="3"/>
+  <rect x="340" y="249" width="520" height="60" rx="30" fill="#fbf9f0" stroke="#b88d3b" stroke-width="2.4"/>
+  <rect x="340" y="1488" width="520" height="60" rx="30" fill="#fbf9f0" stroke="#b88d3b" stroke-width="2.4"/>
+
+  <path d="M455 146c34-50 85-78 145-78s111 28 145 78" fill="url(#vine)" stroke="#2e9979" stroke-width="4"/>
+  <path d="M455 1654c34 50 85 78 145 78s111-28 145-78" fill="url(#vine)" stroke="#2e9979" stroke-width="4"/>
+
+  <g opacity="0.95">
+    <use href="#petalTop" x="230" y="126"/>
+    <use href="#petalTop" x="264" y="126"/>
+    <use href="#petalTop" x="298" y="126"/>
+    <use href="#petalTop" x="332" y="126"/>
+    <use href="#petalTop" x="366" y="126"/>
+    <use href="#petalTop" x="400" y="126"/>
+    <use href="#petalTop" x="434" y="126"/>
+    <use href="#petalTop" x="468" y="126"/>
+    <use href="#petalTop" x="502" y="126"/>
+    <use href="#petalTop" x="536" y="126"/>
+    <use href="#petalTop" x="570" y="126"/>
+    <use href="#petalTop" x="604" y="126"/>
+    <use href="#petalTop" x="638" y="126"/>
+    <use href="#petalTop" x="672" y="126"/>
+    <use href="#petalTop" x="706" y="126"/>
+    <use href="#petalTop" x="740" y="126"/>
+    <use href="#petalTop" x="774" y="126"/>
+    <use href="#petalTop" x="808" y="126"/>
+    <use href="#petalTop" x="842" y="126"/>
+    <use href="#petalTop" x="876" y="126"/>
+    <use href="#petalTop" x="910" y="126"/>
+  </g>
+
+  <g transform="translate(0 1800) scale(1 -1)" opacity="0.95">
+    <use href="#petalTop" x="230" y="126"/>
+    <use href="#petalTop" x="264" y="126"/>
+    <use href="#petalTop" x="298" y="126"/>
+    <use href="#petalTop" x="332" y="126"/>
+    <use href="#petalTop" x="366" y="126"/>
+    <use href="#petalTop" x="400" y="126"/>
+    <use href="#petalTop" x="434" y="126"/>
+    <use href="#petalTop" x="468" y="126"/>
+    <use href="#petalTop" x="502" y="126"/>
+    <use href="#petalTop" x="536" y="126"/>
+    <use href="#petalTop" x="570" y="126"/>
+    <use href="#petalTop" x="604" y="126"/>
+    <use href="#petalTop" x="638" y="126"/>
+    <use href="#petalTop" x="672" y="126"/>
+    <use href="#petalTop" x="706" y="126"/>
+    <use href="#petalTop" x="740" y="126"/>
+    <use href="#petalTop" x="774" y="126"/>
+    <use href="#petalTop" x="808" y="126"/>
+    <use href="#petalTop" x="842" y="126"/>
+    <use href="#petalTop" x="876" y="126"/>
+    <use href="#petalTop" x="910" y="126"/>
+  </g>
+
+  <g>
+    <use href="#sideFlower" x="132" y="900"/>
+    <use href="#sideFlower" x="1068" y="900"/>
+  </g>
+
+  <g opacity="0.84">
+    <rect x="155" y="312" width="22" height="1176" fill="url(#diamondBand)" stroke="#2e9979" stroke-width="1"/>
+    <rect x="1023" y="312" width="22" height="1176" fill="url(#diamondBand)" stroke="#2e9979" stroke-width="1"/>
+  </g>
+
+  <rect x="332" y="378" width="536" height="1044" fill="none" stroke="#2e9979" stroke-width="1.5" opacity="0.65"/>
+</svg>

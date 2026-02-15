@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 220" role="img" aria-label="Mushaf side tag ornament">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e9f7f0"/>
+      <stop offset="100%" stop-color="#d1eadf"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3ca888"/>
+      <stop offset="100%" stop-color="#247c61"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9bc0"/>
+      <stop offset="100%" stop-color="#d45b8c"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M42 7c8 0 14 6 14 14v14H28V21c0-8 6-14 14-14Z" fill="#eff8f3" stroke="#2e9878" stroke-width="2"/>
+
+  <path d="M12 30h60v154c0 16-13 29-30 29s-30-13-30-29V30Z" fill="url(#body)" stroke="#2e9878" stroke-width="2.2"/>
+  <rect x="18" y="38" width="48" height="146" rx="16" fill="none" stroke="#b88d3b" stroke-width="2"/>
+
+  <circle cx="42" cy="64" r="15" fill="url(#accent)"/>
+  <circle cx="42" cy="64" r="9" fill="#f7f2df"/>
+  <circle cx="42" cy="64" r="4" fill="url(#pink)"/>
+
+  <path d="M24 100h36" stroke="#2e9878" stroke-width="2"/>
+  <path d="M24 122h36" stroke="#2e9878" stroke-width="2"/>
+  <path d="M24 144h36" stroke="#2e9878" stroke-width="2"/>
+
+  <circle cx="26" cy="172" r="3.4" fill="#d85d8f"/>
+  <circle cx="42" cy="172" r="3.4" fill="#d85d8f"/>
+  <circle cx="58" cy="172" r="3.4" fill="#d85d8f"/>
+</svg>

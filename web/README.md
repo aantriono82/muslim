@@ -29,6 +29,7 @@ bun run dev
 - `npm run build`
 - `npm run preview`
 - `npm run test` (Vitest)
+- `npm run audit:mushaf-pages` (audit jumlah ayat kartu mushaf vs kartu penjelasan)
 - `npm run test:visual` (Playwright visual)
 - `npm run test:pwa` (Playwright PWA)
 - `npm run test:visual:update` (update snapshot visual)

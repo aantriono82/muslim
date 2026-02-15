@@ -1,0 +1,16 @@
+export const MUSHAF_TOTAL_PAGES = 604;
+
+export const MUSHAF_CONTINUATION_APPEND_PAGE_LIST = [
+  255, 434, 440, 458, 467, 489, 502, 515, 523, 528, 531, 534, 537, 545, 551,
+  554, 564, 566, 568, 570, 575, 577, 578, 580, 583, 587, 591, 595, 598, 599,
+] as const;
+
+export const MUSHAF_CONTINUATION_APPEND_PAGES = new Set<number>(
+  MUSHAF_CONTINUATION_APPEND_PAGE_LIST,
+);
+
+export const MUSHAF_CONTINUATION_SKIP_PAGES = new Set<number>(
+  MUSHAF_CONTINUATION_APPEND_PAGE_LIST.map((page) => page + 1).filter(
+    (page) => page <= MUSHAF_TOTAL_PAGES,
+  ),
+);

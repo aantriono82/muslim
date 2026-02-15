@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run src",
+    "audit:mushaf-pages": "bun scripts/audit-mushaf-explanation-pages.mjs",
     "generate:matsurat-ayahs": "bun scripts/generate-matsurat-surah-ayahs.mjs",
     "test:visual": "playwright test",
     "test:pwa": "playwright test -c playwright.pwa.config.ts",
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.476.0",
+    "pdfjs-dist": "^5.4.624",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3"
