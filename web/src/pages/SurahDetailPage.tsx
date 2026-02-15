@@ -85,6 +85,21 @@ const isNearDuplicateAsbabText = (leftRaw: string, rightRaw: string) => {
   const covered = Math.min(maxLength, sharedPrefix + sharedSuffix);
   return covered / maxLength >= 0.96;
 };
+const normalizeText = (value?: string | null) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+};
+const formatSurahTitleWithMeaning = (
+  nameLatin?: string | null,
+  meaning?: string | null,
+) => {
+  const latin = normalizeText(nameLatin) ?? "Surah";
+  const translation = normalizeText(meaning);
+  if (!translation || translation.toLowerCase() === latin.toLowerCase()) {
+    return latin;
+  }
+  return `${latin} (${translation})`;
+};
 
 type SurahLabelVariant = "gold" | "blue";
 
@@ -482,12 +497,16 @@ const SurahDetailPage = () => {
   }, [surahList]);
   const mushafHeaderLatin = useMemo(() => {
     if (!mushafPageSurahNumbers.length) {
-      return meta?.name_latin ?? "Mushaf Madinah";
+      return formatSurahTitleWithMeaning(meta?.name_latin, meta?.translation);
     }
     return mushafPageSurahNumbers
-      .map((number) => surahMap.get(number)?.name_latin ?? `Surah ${number}`)
+      .map((number) => {
+        const surah = surahMap.get(number);
+        if (!surah) return `Surah ${number}`;
+        return formatSurahTitleWithMeaning(surah.name_latin, surah.translation);
+      })
       .join(" • ");
-  }, [mushafPageSurahNumbers, surahMap, meta?.name_latin]);
+  }, [mushafPageSurahNumbers, surahMap, meta?.name_latin, meta?.translation]);
   const mushafHeaderArabic = useMemo(() => {
     if (!mushafPageSurahNumbers.length) {
       return meta?.name ?? "المصحف";
@@ -499,6 +518,11 @@ const SurahDetailPage = () => {
       )
       .join(" • ");
   }, [mushafPageSurahNumbers, surahMap, meta?.name]);
+  const activeSurahTitle = formatSurahTitleWithMeaning(
+    meta?.name_latin,
+    meta?.translation,
+  );
+  const activeSurahRevelation = normalizeText(meta?.revelation);
   const mushafTotalPages = useMemo(() => {
     const raw = Number(
       import.meta.env.VITE_MUSHAF_TOTAL_PAGES ?? DEFAULT_MUSHAF_TOTAL_PAGES,
@@ -1138,21 +1162,23 @@ const SurahDetailPage = () => {
                         <div className="mushaf-ornament-side right" />
                         <div className="mushaf-header-content space-y-3">
                           <div className="mushaf-title">
-                            <span>{meta.name_latin}</span>
+                            <span>{activeSurahTitle}</span>
                             <span className="font-arabic text-base sm:text-lg">
                               {meta.name}
                             </span>
                           </div>
                           <div className="flex flex-wrap justify-center gap-2">
                             <span className="mushaf-chip">
-                              {meta.revelation}
-                            </span>
-                            <span className="mushaf-chip">
-                              {meta.translation}
+                              Arti: {meta.translation}
                             </span>
                             <span className="mushaf-chip">
                               {meta.number_of_ayahs} ayat
                             </span>
+                            {activeSurahRevelation ? (
+                              <span className="mushaf-chip">
+                                {activeSurahRevelation}
+                              </span>
+                            ) : null}
                           </div>
                         </div>
                       </div>
@@ -1289,6 +1315,14 @@ const SurahDetailPage = () => {
                           <span className="mushaf-chip">
                             Halaman {activeMushafPage}
                           </span>
+                          <span className="mushaf-chip">
+                            {meta.number_of_ayahs} ayat
+                          </span>
+                          {activeSurahRevelation ? (
+                            <span className="mushaf-chip">
+                              {activeSurahRevelation}
+                            </span>
+                          ) : null}
                         </div>
                       </div>
                     </div>
@@ -1712,8 +1746,7 @@ const SurahDetailPage = () => {
                                   type="button"
                                   onClick={() => {
                                     if (!ayahMushafPage) return;
-                                    const shouldScrollToPdf =
-                                      readingMode !== "pdf";
+                                    const shouldScrollToPdf = true;
                                     setReadingMode("pdf");
                                     setMushafPage(
                                       clampMushafPage(ayahMushafPage),

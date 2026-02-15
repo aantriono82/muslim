@@ -187,29 +187,9 @@ const pickRangeLabel = (ayahs) => {
 };
 
 const shouldAppendByHeuristic = (page, pageCache, surahTotals) => {
-  const current = pageCache.get(page) ?? [];
-  if (!current.length || page >= MUSHAF_TOTAL_PAGES) return false;
-
-  const last = current[current.length - 1];
-  const hasMultipleSurah =
-    new Set(current.map((ayah) => ayah.surahNumber)).size > 1;
-  const hasOpeningOfLastSurah = current.some(
-    (ayah) => ayah.surahNumber === last.surahNumber && ayah.ayahNumber === 1,
-  );
-  if (!hasMultipleSurah || !hasOpeningOfLastSurah) return false;
-  if (last.surahNumber === 9) return false;
-
-  const totalAyahsInSurah = surahTotals.get(last.surahNumber);
-  if (totalAyahsInSurah && last.ayahNumber >= totalAyahsInSurah) return false;
-
-  const next = pageCache.get(page + 1) ?? [];
-  const nextFirst = next[0];
-  if (!nextFirst) return false;
-
-  return (
-    nextFirst.surahNumber === last.surahNumber &&
-    nextFirst.ayahNumber === last.ayahNumber + 1
-  );
+  // UX policy: kartu mushaf dan kartu penjelasan harus memakai basis hitung
+  // ayat yang sama, yaitu hanya ayat dari halaman aktif.
+  return false;
 };
 
 const renderCurrentPageAyahs = (page, pageCache) => {
@@ -309,7 +289,9 @@ const run = async () => {
     });
   });
 
-  console.log("page\traw\trendered\texpected\traw_range\trendered_range\tstatus");
+  console.log(
+    "page\traw\trendered\texpected\traw_range\trendered_range\tstatus",
+  );
   rows.forEach((row) => {
     console.log(
       `${row.page}\t${row.rawCount}\t${row.renderedCount}\t${row.expectedCount}\t${row.rawRange}\t${row.renderedRange}\t${row.status}`,

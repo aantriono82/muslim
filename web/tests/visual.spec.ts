@@ -88,6 +88,16 @@ const surahDetail2 = {
   ],
 };
 
+const quranPageRowsByPage: Record<string, unknown[]> = {
+  "1": surahDetail2.ayahs.map((ayah) => ({
+    id: ayah.id,
+    surah_number: ayah.surah_number,
+    ayah_number: ayah.ayah_number,
+    arab: ayah.arab,
+    translation: ayah.translation,
+  })),
+};
+
 const ayahDetailMap: Record<string, unknown> = {
   "1:1": surahDetail1.ayahs[0],
   "1:2": surahDetail1.ayahs[1],
@@ -265,6 +275,9 @@ const sholatSchedule = {
   },
 };
 
+const mockPng1x1Base64 =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Z2YQAAAAASUVORK5CYII=";
+
 const respondApi = async (
   route: Route,
   data: unknown,
@@ -293,6 +306,14 @@ const respondMuslim = async (route: Route, data: unknown) => {
 };
 
 const setupApiMocks = async (page: Page) => {
+  await page.route("https://cdn.myquran.com/img/page/**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "image/png",
+      body: Buffer.from(mockPng1x1Base64, "base64"),
+    });
+  });
+
   await page.route("**/api/muslim/**", async (route, request) => {
     const url = new URL(request.url());
     const path = url.pathname.replace("/api/muslim", "");
@@ -317,6 +338,11 @@ const setupApiMocks = async (page: Page) => {
     const url = new URL(request.url());
     const path = url.pathname;
 
+    if (path.startsWith("/api/muslim/")) {
+      await route.fallback();
+      return;
+    }
+
     if (path === "/api/quran") {
       await respondApi(route, surahList);
       return;
@@ -329,6 +355,12 @@ const setupApiMocks = async (page: Page) => {
 
     if (path.startsWith("/api/quran/explore")) {
       await respondApi(route, []);
+      return;
+    }
+
+    if (path.startsWith("/api/quran/page/")) {
+      const pageNumber = path.split("/").pop() ?? "";
+      await respondApi(route, quranPageRowsByPage[pageNumber] ?? []);
       return;
     }
 
@@ -544,8 +576,12 @@ test("surah-detail", async ({ page }) => {
 
 test("surah-detail-asbab-modal", async ({ page }) => {
   await page.goto("/quran/2");
-  await page.getByRole("button", { name: "Asbabun Nuzul" }).first().click();
-  await page.getByText("Asbabun Nuzul").first().waitFor();
+  const asbabButton = page
+    .getByRole("button", { name: "Asbabun Nuzul" })
+    .first();
+  await asbabButton.waitFor({ state: "visible" });
+  await asbabButton.click();
+  await page.getByRole("dialog", { name: "Asbabun Nuzul" }).waitFor();
   await snapshot(page, "surah-detail-asbab-modal.png");
 });
 
@@ -557,8 +593,8 @@ test("ayah-detail", async ({ page }) => {
 
 test("ayah-detail-asbab-modal", async ({ page }) => {
   await page.goto("/quran/2/1");
-  await page.getByRole("button", { name: "Lihat Asbabun Nuzul" }).click();
-  await page.getByText("Asbabun Nuzul").first().waitFor();
+  await page.getByRole("heading", { name: "Asbabun Nuzul" }).waitFor();
+  await page.getByText(/asbabun nuzul contoh/i).waitFor();
   await snapshot(page, "ayah-detail-asbab-modal.png");
 });
 
