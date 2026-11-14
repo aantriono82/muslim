@@ -16,7 +16,7 @@ npm run dev
 Buka:
 - `http://localhost:5173`
 
-Alternatif dengan Bun:
+Alternatif dengan Bun (lockfile Bun tidak di-commit, lihat catatan deploy):
 
 ```bash
 bun install
@@ -55,10 +55,11 @@ Konfigurasi yang dipakai agar build stabil:
 
 Catatan:
 
-- Hindari menaruh file `web/bun.lockb` aktif di branch deploy, karena Cloudflare
-  bisa memilih `bun install --frozen-lockfile` dan gagal pada image Bun lama.
-- Repository ini menyimpan lockfile Bun sebagai `web/bun.lockb.disabled` agar
-  Pages tetap memilih alur npm berdasarkan `package-lock.json`.
+- `web` hanya memakai `package-lock.json` (npm). File `bun.lock`/`bun.lockb`
+  sengaja di-ignore, karena jika ada, Cloudflare bisa memilih
+  `bun install --frozen-lockfile` dan gagal pada image Bun lama. Setelah
+  menambah dependency, selalu jalankan `npm install` agar `package-lock.json`
+  ikut terbarui.
 
 ```bash
 cd web

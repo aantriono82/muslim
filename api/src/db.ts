@@ -1,7 +1,10 @@
 import { Database } from "bun:sqlite";
-import { join } from "path";
+import { join, resolve } from "path";
 
-const dbPath = join(import.meta.dir, "../data.sqlite");
+// Samakan dengan api/scripts/backup-db.ts & restore-db.ts: DB_PATH env > default.
+export const dbPath = resolve(
+  process.env.DB_PATH ?? join(import.meta.dir, "../data.sqlite"),
+);
 
 export const db = new Database(dbPath, { create: true });
 
