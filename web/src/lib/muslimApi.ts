@@ -3,8 +3,17 @@ const MUSLIM_API_BASE =
 const MUSLIM_TIMEOUT_MS = 12000;
 const MUSLIM_MAX_ATTEMPTS = 2;
 const ASBAB_CACHE_TTL = 6 * 60 * 60 * 1000;
+// Setelah layanan terdeteksi mati, jangan coba lagi selama jeda ini agar
+// halaman surah tidak mengirim puluhan request gagal (satu per ayat).
+const MUSLIM_UNAVAILABLE_COOLDOWN_MS = 5 * 60 * 1000;
 
-type MuslimApiErrorCode = "network" | "timeout" | "http" | "non-json" | "parse";
+type MuslimApiErrorCode =
+  | "network"
+  | "timeout"
+  | "http"
+  | "non-json"
+  | "parse"
+  | "unavailable";
 
 class MuslimApiError extends Error {
   status: number;
@@ -49,6 +58,22 @@ const buildMuslimUrl = (path: string) => {
   const cleaned = path.startsWith("/") ? path : `/${path}`;
   return `${MUSLIM_API_BASE}${cleaned}`;
 };
+
+let muslimApiDownUntil = 0;
+
+const isServiceFailure = (err: MuslimApiError) =>
+  err.code === "network" ||
+  err.code === "timeout" ||
+  err.code === "non-json" ||
+  err.code === "unavailable" ||
+  (err.code === "http" && err.status >= 500);
+
+/**
+ * True jika error berarti layanan Asbabun Nuzul tidak dapat diakses
+ * (bukan sekadar "data untuk ayat ini tidak ada").
+ */
+export const isMuslimApiUnavailableError = (err: unknown) =>
+  err instanceof MuslimApiError && isServiceFailure(err);
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -116,6 +141,26 @@ const isAbortError = (err: unknown) =>
   (err as { name?: unknown }).name === "AbortError";
 
 const fetchMuslimApi = async <T>(
+  path: string,
+): Promise<MuslimApiResponse<T>> => {
+  if (Date.now() < muslimApiDownUntil) {
+    throw new MuslimApiError(
+      "Layanan Asbabun Nuzul sedang tidak dapat diakses.",
+      0,
+      "unavailable",
+    );
+  }
+  try {
+    return await fetchMuslimApiOnce<T>(path);
+  } catch (err) {
+    if (err instanceof MuslimApiError && isServiceFailure(err)) {
+      muslimApiDownUntil = Date.now() + MUSLIM_UNAVAILABLE_COOLDOWN_MS;
+    }
+    throw err;
+  }
+};
+
+const fetchMuslimApiOnce = async <T>(
   path: string,
 ): Promise<MuslimApiResponse<T>> => {
   const url = buildMuslimUrl(path);

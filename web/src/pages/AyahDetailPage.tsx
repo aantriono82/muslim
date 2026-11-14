@@ -6,10 +6,19 @@ import SectionHeader from "../components/SectionHeader";
 import { Card, ErrorState, LoadingState } from "../components/State";
 import { ApiError, fetchJson } from "../lib/api";
 import { toArabicNumber } from "../lib/arabic";
-import { fetchAsbabByAyahId, fetchMuslimAyah } from "../lib/muslimApi";
+import {
+  fetchAsbabByAyahId,
+  fetchMuslimAyah,
+  isMuslimApiUnavailableError,
+} from "../lib/muslimApi";
 import type { AyahItem } from "../lib/types";
 
 const ASBAB_EMPTY_TEXT = "Asbabun Nuzul belum tersedia untuk ayat ini.";
+const ASBAB_LOADING_TEXT = "Memuat Asbabun Nuzul...";
+const ASBAB_UNAVAILABLE_TEXT =
+  "Layanan Asbabun Nuzul sedang tidak dapat diakses. Silakan coba lagi nanti.";
+
+type AsbabStatus = "loading" | "ready" | "empty" | "unavailable";
 
 const AyahDetailPage = () => {
   const { surahId, ayahId } = useParams();
@@ -17,6 +26,7 @@ const AyahDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [asbabText, setAsbabText] = useState<string | null>(null);
+  const [asbabStatus, setAsbabStatus] = useState<AsbabStatus>("loading");
 
   useEffect(() => {
     if (!surahId || !ayahId) {
@@ -63,18 +73,26 @@ const AyahDetailPage = () => {
 
     const loadAsbab = async () => {
       setAsbabText(null);
+      setAsbabStatus("loading");
 
       try {
         const ayah = await fetchMuslimAyah(surahId, ayahId);
         if (!active) return;
         const globalId = ayah?.id?.toString().trim();
-        if (!globalId) return;
+        if (!globalId) {
+          setAsbabStatus("empty");
+          return;
+        }
         const entry = await fetchAsbabByAyahId(globalId);
         if (!active) return;
         const text = entry?.text?.toString().trim() ?? "";
-        if (text) setAsbabText(text);
-      } catch {
-        // ignore asbab fetch errors
+        setAsbabText(text || null);
+        setAsbabStatus(text ? "ready" : "empty");
+      } catch (err) {
+        if (!active) return;
+        setAsbabStatus(
+          isMuslimApiUnavailableError(err) ? "unavailable" : "empty",
+        );
       }
     };
 
@@ -85,7 +103,13 @@ const AyahDetailPage = () => {
   }, [surahId, ayahId]);
 
   const asbabNuzul = asbabText?.trim() || null;
-  const asbabContent = asbabNuzul ?? ASBAB_EMPTY_TEXT;
+  const asbabContent =
+    asbabNuzul ??
+    (asbabStatus === "loading"
+      ? ASBAB_LOADING_TEXT
+      : asbabStatus === "unavailable"
+        ? ASBAB_UNAVAILABLE_TEXT
+        : ASBAB_EMPTY_TEXT);
 
   return (
     <div className="py-10">

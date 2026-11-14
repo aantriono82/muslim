@@ -11,13 +11,19 @@ import {
   MUSHAF_CONTINUATION_SKIP_PAGES,
   MUSHAF_TOTAL_PAGES,
 } from "../lib/mushafContinuationPages";
-import { fetchAsbabByAyahId, fetchMuslimAyah } from "../lib/muslimApi";
+import {
+  fetchAsbabByAyahId,
+  fetchMuslimAyah,
+  isMuslimApiUnavailableError,
+} from "../lib/muslimApi";
 import type { SurahDetail, SurahItem } from "../lib/types";
 
 const PAGE_LIMIT = 20;
 const DEFAULT_MUSHAF_TOTAL_PAGES = MUSHAF_TOTAL_PAGES;
 const MUSHAF_IMAGE_CDN_BASE = "https://cdn.myquran.com/img/page";
 const ASBAB_UNAVAILABLE_TEXT = "Asbabun Nuzul belum tersedia untuk ayat ini.";
+const ASBAB_SERVICE_DOWN_TEXT =
+  "Layanan Asbabun Nuzul sedang tidak dapat diakses. Silakan coba lagi nanti.";
 const BASMALAH_ARABIC = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
 const BASMALAH_TRANSLATION =
   "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.";
@@ -440,8 +446,12 @@ const SurahDetailPage = () => {
         [ayahKey]: normalized,
       }));
       applyModalText(text);
-    } catch {
-      applyModalText(ASBAB_UNAVAILABLE_TEXT);
+    } catch (err) {
+      applyModalText(
+        isMuslimApiUnavailableError(err)
+          ? ASBAB_SERVICE_DOWN_TEXT
+          : ASBAB_UNAVAILABLE_TEXT,
+      );
     }
   };
 
