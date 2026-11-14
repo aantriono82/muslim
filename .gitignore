@@ -1,0 +1,2 @@
+# Output lokal skrip backup (api/scripts/backup-db.ts, ops/scripts/run-backup-cron.sh)
+backups/

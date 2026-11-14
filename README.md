@@ -36,7 +36,7 @@ Prasyarat:
 1. Jalankan API proxy (`apimuslim-proxy`) di port `3002`:
 
 ```bash
-cd /home/aantriono/Code/muslim/apimuslim-proxy
+cd apimuslim-proxy
 bun install
 bun run dev
 ```
@@ -44,7 +44,7 @@ bun run dev
 2. Jalankan frontend (`web`) di port `5173`:
 
 ```bash
-cd /home/aantriono/Code/muslim/web
+cd web
 npm install
 npm run dev
 ```
@@ -58,7 +58,7 @@ http://localhost:5173
 4. Opsional: jalankan API users terpisah (`http://localhost:4001/api`):
 
 ```bash
-cd /home/aantriono/Code/muslim/api
+cd api
 bun install
 bun run dev
 ```

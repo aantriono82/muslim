@@ -8,7 +8,7 @@ Frontend MuslimKit berbasis React + Vite + Tailwind + PWA.
 2. Jalankan web:
 
 ```bash
-cd /home/aantriono/Code/muslim/web
+cd web
 npm install
 npm run dev
 ```
@@ -61,7 +61,7 @@ Catatan:
   Pages tetap memilih alur npm berdasarkan `package-lock.json`.
 
 ```bash
-cd /home/aantriono/Code/muslim/web
+cd web
 export CF_PAGES_PROJECT="nama-project-pages"
 npm run deploy:cloudflare
 ```

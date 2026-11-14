@@ -9,7 +9,7 @@ Catatan:
 ## Menjalankan
 
 ```bash
-cd /home/aantriono/Code/muslim/api
+cd api
 bun install
 bun run dev
 ```
@@ -60,28 +60,28 @@ Database SQLite tersimpan di:
 Contoh backup terenkripsi:
 
 ```bash
-cd /home/aantriono/Code/muslim/api
+cd api
 BACKUP_PASSPHRASE='ganti-dengan-passphrase-kuat' bun run backup
 ```
 
 Contoh restore:
 
 ```bash
-cd /home/aantriono/Code/muslim/api
+cd api
 BACKUP_PASSPHRASE='ganti-dengan-passphrase-kuat' bun run restore -- --file ../backups/api/users-YYYY-MM-DDTHH-MM-SS-sssZ.sqlite.enc
 ```
 
 Contoh verifikasi berkala (paling baru 20 file):
 
 ```bash
-cd /home/aantriono/Code/muslim/api
+cd api
 BACKUP_PASSPHRASE='ganti-dengan-passphrase-kuat' bun run backup:verify -- --limit 20
 ```
 
 Contoh prune backup lama:
 
 ```bash
-cd /home/aantriono/Code/muslim/api
+cd api
 BACKUP_RETENTION_DAYS=30 BACKUP_KEEP_MIN=10 bun run backup:prune
 ```
 

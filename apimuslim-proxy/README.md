@@ -11,7 +11,7 @@ Fungsi utama:
 ## Menjalankan
 
 ```bash
-cd /home/aantriono/Code/muslim/apimuslim-proxy
+cd apimuslim-proxy
 bun install
 bun run dev
 ```
